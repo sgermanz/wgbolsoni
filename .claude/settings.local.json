@@ -1,0 +1,7 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(ls -la \"C:/Users/sergi/OneDrive/Área de Trabalho/wilton/sitec\" 2>/dev/null; echo \"---\"; ls -la \"C:/Users/sergi/OneDrive/Área de Trabalho/wilton\" 2>/dev/null)"
+    ]
+  }
+}
