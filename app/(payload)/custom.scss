@@ -1,0 +1,8 @@
+/* Custom admin styling. Loaded only inside the (payload) route group, so
+ * nothing here can affect the public site. Keep brand alignment minimal —
+ * the goal is a familiar Payload UX, not a redesign. */
+
+:root {
+  --theme-elevation-50: #f7faf8;
+  --theme-success-500: #2f8049; /* brand green */
+}
