@@ -15,6 +15,7 @@ import { Posts } from "./cms/collections/Posts";
 import { Books } from "./cms/collections/Books";
 import { ContactMessages } from "./cms/collections/ContactMessages";
 import { SiteSettings } from "./cms/globals/SiteSettings";
+import { seed } from "./cms/seed";
 
 const filename = fileURLToPath(import.meta.url);
 const dirname = path.dirname(filename);
@@ -65,6 +66,14 @@ export default buildConfig({
     ContactMessages,
   ],
   globals: [SiteSettings],
+  onInit: async (payload) => {
+    if (process.env.PAYLOAD_DISABLE_SEED === "true") return;
+    try {
+      await seed(payload);
+    } catch (error) {
+      payload.logger.warn(`[seed] failed: ${(error as Error).message}`);
+    }
+  },
   typescript: {
     outputFile: path.resolve(dirname, "payload-types.ts"),
   },

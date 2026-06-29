@@ -3,15 +3,19 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ArrowUpRight, ArrowLeft } from "lucide-react";
 
-import { AREAS, areaBySlug } from "@/lib/areas";
+import { getAllAreas, getAreaBySlug } from "@/lib/content";
 import { Reveal } from "@/components/reveal";
 import { CTA } from "@/components/cta";
+import { RichBody } from "@/components/rich-body";
 import { SITE } from "@/lib/site";
 
 type Params = { slug: string };
 
-export function generateStaticParams() {
-  return AREAS.map((a) => ({ slug: a.slug }));
+export const dynamicParams = true;
+
+export async function generateStaticParams() {
+  const areas = await getAllAreas();
+  return areas.map((a) => ({ slug: a.slug }));
 }
 
 export async function generateMetadata({
@@ -20,7 +24,7 @@ export async function generateMetadata({
   params: Promise<Params>;
 }): Promise<Metadata> {
   const { slug } = await params;
-  const area = areaBySlug(slug);
+  const area = await getAreaBySlug(slug);
   if (!area) return {};
 
   return {
@@ -41,13 +45,13 @@ export default async function AreaPage({
   params: Promise<Params>;
 }) {
   const { slug } = await params;
-  const area = areaBySlug(slug);
+  const area = await getAreaBySlug(slug);
   if (!area) notFound();
 
-  // Próxima e anterior, para navegação no rodapé da página.
-  const idx = AREAS.findIndex((a) => a.slug === area.slug);
-  const prev = AREAS[(idx - 1 + AREAS.length) % AREAS.length];
-  const next = AREAS[(idx + 1) % AREAS.length];
+  const areas = await getAllAreas();
+  const idx = areas.findIndex((a) => a.slug === area.slug);
+  const prev = areas[(idx - 1 + areas.length) % areas.length];
+  const next = areas[(idx + 1) % areas.length];
 
   return (
     <>
@@ -92,11 +96,10 @@ export default async function AreaPage({
       {/* CORPO */}
       <section className="mx-auto max-w-3xl px-5 py-16 lg:px-8 lg:py-24">
         <Reveal>
-          <div className="prose">
-            {area.body.map((p, i) => (
-              <p key={i}>{p}</p>
-            ))}
-          </div>
+          <RichBody
+            lexical={area.bodyLexical}
+            paragraphs={area.bodyParagraphs}
+          />
         </Reveal>
 
         {/* SUBITENS (caso Florestamentos → Biomassa) */}
