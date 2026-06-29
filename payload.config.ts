@@ -7,10 +7,19 @@ import { nodemailerAdapter } from "@payloadcms/email-nodemailer";
 import { buildConfig } from "payload";
 import sharp from "sharp";
 
+import { Users } from "./cms/collections/Users";
+import { Media } from "./cms/collections/Media";
+import { Areas } from "./cms/collections/Areas";
+import { Pages } from "./cms/collections/Pages";
+import { Posts } from "./cms/collections/Posts";
+import { Books } from "./cms/collections/Books";
+import { ContactMessages } from "./cms/collections/ContactMessages";
+import { SiteSettings } from "./cms/globals/SiteSettings";
+
 const filename = fileURLToPath(import.meta.url);
 const dirname = path.dirname(filename);
 
-// Fallbacks deixam o `next build` rodar sem .env. Em runtime, exigimos as vars reais.
+// Fallbacks let `next build` succeed without .env. Runtime requires real values.
 const databaseURI =
   process.env.DATABASE_URI ||
   "postgres://payload:payload@localhost:5432/payload";
@@ -22,25 +31,18 @@ export default buildConfig({
   serverURL,
   secret: payloadSecret,
   admin: {
-    user: "users",
-    importMap: {
-      baseDir: path.resolve(dirname),
-    },
-    meta: {
-      titleSuffix: "— WG Bolsoni",
-    },
+    user: Users.slug,
+    importMap: { baseDir: path.resolve(dirname) },
+    meta: { titleSuffix: "— WG Bolsoni" },
   },
   editor: lexicalEditor(),
   db: postgresAdapter({
-    pool: {
-      connectionString: databaseURI,
-    },
+    pool: { connectionString: databaseURI },
   }),
   sharp,
   email: process.env.SMTP_HOST
     ? nodemailerAdapter({
-        defaultFromAddress:
-          process.env.SMTP_FROM || "wgb@wgbolsoni.net",
+        defaultFromAddress: process.env.SMTP_FROM || "wgb@wgbolsoni.net",
         defaultFromName: process.env.SMTP_FROM_NAME || "WG Bolsoni",
         transportOptions: {
           host: process.env.SMTP_HOST,
@@ -48,77 +50,21 @@ export default buildConfig({
           secure: process.env.SMTP_SECURE === "true",
           auth:
             process.env.SMTP_USER && process.env.SMTP_PASS
-              ? {
-                  user: process.env.SMTP_USER,
-                  pass: process.env.SMTP_PASS,
-                }
+              ? { user: process.env.SMTP_USER, pass: process.env.SMTP_PASS }
               : undefined,
         },
       })
     : undefined,
   collections: [
-    {
-      slug: "users",
-      auth: true,
-      admin: {
-        useAsTitle: "email",
-        defaultColumns: ["email", "role", "updatedAt"],
-      },
-      access: {
-        admin: ({ req }) => Boolean(req.user),
-      },
-      fields: [
-        {
-          name: "name",
-          type: "text",
-          required: true,
-        },
-        {
-          name: "role",
-          type: "select",
-          required: true,
-          defaultValue: "editor",
-          options: [
-            { label: "Admin", value: "admin" },
-            { label: "Editor", value: "editor" },
-          ],
-        },
-      ],
-    },
-    {
-      slug: "media",
-      upload: {
-        staticDir: path.resolve(dirname, "media"),
-        imageSizes: [
-          { name: "thumbnail", width: 400, height: 300, position: "centre" },
-          { name: "card", width: 768, height: 512, position: "centre" },
-          { name: "cover", width: 1600, height: 900, position: "centre" },
-        ],
-        adminThumbnail: "thumbnail",
-        mimeTypes: ["image/*", "video/*"],
-      },
-      admin: {
-        useAsTitle: "filename",
-      },
-      fields: [
-        {
-          name: "alt",
-          type: "text",
-          required: true,
-          label: "Texto alternativo",
-        },
-        {
-          name: "caption",
-          type: "text",
-        },
-        {
-          name: "credit",
-          type: "text",
-          label: "Crédito",
-        },
-      ],
-    },
+    Users,
+    Media,
+    Areas,
+    Pages,
+    Posts,
+    Books,
+    ContactMessages,
   ],
+  globals: [SiteSettings],
   typescript: {
     outputFile: path.resolve(dirname, "payload-types.ts"),
   },
