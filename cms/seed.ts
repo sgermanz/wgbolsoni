@@ -1,4 +1,5 @@
 import type { Payload } from "payload";
+import { pushDevSchema } from "@payloadcms/drizzle";
 
 import { AREAS } from "@/lib/areas";
 import { SITE, NAV_TOP } from "@/lib/site";
@@ -31,18 +32,13 @@ export async function seed(payload: Payload): Promise<void> {
  * and safe to re-run.
  */
 async function ensureSchema(payload: Payload): Promise<void> {
-  const db = payload.db as unknown as {
-    pushDevSchema?: () => Promise<void>;
-  };
-  if (typeof db.pushDevSchema !== "function") {
-    payload.logger.warn(
-      "[schema] adapter has no pushDevSchema — skipping (run migrations manually)",
-    );
-    return;
-  }
   payload.logger.info("[schema] syncing Postgres schema (pushDevSchema)…");
   try {
-    await db.pushDevSchema();
+    // The db-postgres adapter only auto-pushes when NODE_ENV !== 'production'
+    // (see node_modules/@payloadcms/db-postgres/dist/connect.js). On Railway,
+    // NODE_ENV is 'production', so we call the same utility ourselves.
+    // Safe to re-run: it diffs the schema and applies only what's missing.
+    await pushDevSchema(payload.db as never);
     payload.logger.info("[schema] sync done");
   } catch (error) {
     payload.logger.error(
