@@ -16,7 +16,8 @@ export const SITE = {
 export const NAV_TOP = [
   { label: "Principal", href: "/" },
   { label: "Conceito", href: "/conceito" },
+  { label: "Blog", href: "/blog" },
   { label: "Políticas", href: "/politicas" },
-  { label: "Conversor de Medidas", href: "/conversor" },
+  { label: "Conversor", href: "/conversor" },
   { label: "Contato", href: "/contato" },
 ];
