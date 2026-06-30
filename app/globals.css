@@ -1,0 +1,154 @@
+@import "tailwindcss";
+
+/* -------------------------------------------------------------------------
+ * WG Bolsoni — Design System
+ * Estilo: corporate-modern / minimal Swiss + acento verde sustentabilidade.
+ * Tipografia: Sora (display) + Inter (body) — pareamento profissional clean.
+ * Dark mode: classe `.dark` no <html>, sincronizada com preferência do SO.
+ * Movimento: tudo respeita `prefers-reduced-motion`.
+ * ----------------------------------------------------------------------- */
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+@theme {
+  --font-display: var(--font-sora);
+  --font-sans: var(--font-inter);
+
+  /* Brand — verde sustentável (agro/meio ambiente) */
+  --color-brand-50: #edf7ef;
+  --color-brand-100: #d1ecd7;
+  --color-brand-200: #a3d8ad;
+  --color-brand-300: #71be83;
+  --color-brand-400: #469c5d;
+  --color-brand-500: #2f8049;
+  --color-brand-600: #236639;
+  --color-brand-700: #1d5230;
+  --color-brand-800: #194227;
+  --color-brand-900: #143620;
+
+  /* Accent — CTAs */
+  --color-accent-400: #f4a259;
+  --color-accent-500: #e07a35;
+  --color-accent-600: #c2611f;
+
+  /* Neutros grafite/off-white */
+  --color-ink-50: #f7f7f5;
+  --color-ink-100: #ededea;
+  --color-ink-200: #d8d8d2;
+  --color-ink-300: #b6b6ad;
+  --color-ink-400: #8a8a80;
+  --color-ink-500: #62625a;
+  --color-ink-600: #45453f;
+  --color-ink-700: #2f2f2b;
+  --color-ink-800: #1d1d1a;
+  --color-ink-900: #121210;
+
+  /* Tipografia fluida */
+  --text-fluid-base: clamp(1rem, 0.95rem + 0.25vw, 1.125rem);
+  --text-fluid-lg: clamp(1.125rem, 1rem + 0.6vw, 1.5rem);
+  --text-fluid-xl: clamp(1.5rem, 1.2rem + 1.4vw, 2.25rem);
+  --text-fluid-2xl: clamp(2rem, 1.4rem + 2.6vw, 3.25rem);
+  --text-fluid-3xl: clamp(2.5rem, 1.5rem + 4.4vw, 5rem);
+  --text-fluid-hero: clamp(2.75rem, 1.3rem + 6.5vw, 6rem);
+
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@layer base {
+  :root {
+    --surface: var(--color-ink-50);
+    --surface-2: #ffffff;
+    --content: var(--color-ink-800);
+    --content-soft: var(--color-ink-500);
+    --border: var(--color-ink-200);
+    color-scheme: light;
+  }
+
+  .dark {
+    --surface: var(--color-ink-900);
+    --surface-2: var(--color-ink-800);
+    --content: var(--color-ink-100);
+    --content-soft: var(--color-ink-300);
+    --border: #2c2c28;
+    color-scheme: dark;
+  }
+
+  html {
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    background-color: var(--surface);
+    color: var(--content);
+    font-family: var(--font-sans);
+    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+    -webkit-font-smoothing: antialiased;
+  }
+
+  h1, h2, h3, h4, .font-display {
+    font-family: var(--font-display);
+    letter-spacing: -0.02em;
+    line-height: 1.05;
+  }
+
+  ::selection { background: var(--color-brand-500); color: #fff; }
+
+  :focus-visible {
+    outline: 2px solid var(--color-brand-500);
+    outline-offset: 2px;
+    border-radius: 2px;
+  }
+}
+
+@layer utilities {
+  .text-balance { text-wrap: balance; }
+  .text-pretty { text-wrap: pretty; }
+
+  .gradient-mesh {
+    background:
+      radial-gradient(60% 60% at 20% 20%, color-mix(in oklab, var(--color-brand-500) 35%, transparent), transparent 70%),
+      radial-gradient(50% 50% at 85% 15%, color-mix(in oklab, var(--color-accent-500) 28%, transparent), transparent 70%),
+      radial-gradient(60% 70% at 70% 85%, color-mix(in oklab, var(--color-brand-700) 40%, transparent), transparent 70%);
+  }
+
+  /* Rich text (corpo das páginas internas) */
+  .prose {
+    font-size: var(--text-fluid-base);
+    line-height: 1.75;
+    color: var(--content);
+  }
+  .prose > * + * { margin-top: 1.1em; }
+  .prose h2 {
+    font-family: var(--font-display);
+    font-size: var(--text-fluid-xl);
+    font-weight: 700;
+    margin-top: 1.7em;
+  }
+  .prose a {
+    color: var(--color-brand-600);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    font-weight: 500;
+  }
+  .dark .prose a { color: var(--color-brand-300); }
+  .prose strong { color: var(--content); font-weight: 600; }
+  .prose ul { padding-left: 1.4em; list-style: disc; }
+  .prose li::marker { color: var(--color-brand-500); }
+  .prose blockquote {
+    border-left: 3px solid var(--color-brand-500);
+    padding-left: 1.1em;
+    font-style: italic;
+    color: var(--content-soft);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
