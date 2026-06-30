@@ -5,10 +5,17 @@ import { notFound } from "next/navigation";
 import { ArrowLeft, Calendar, Clock, User } from "lucide-react";
 
 import { getPostBySlug, getRelated, POST_CATEGORY_LABELS } from "@/lib/blog";
+import { getSiteSettings } from "@/lib/content";
 import { lexicalToPlainParagraphs } from "@/lib/lexical";
 import { Reveal } from "@/components/reveal";
 import { RichBody } from "@/components/rich-body";
 import { TTSButton } from "@/components/tts-button";
+import { JsonLd } from "@/components/json-ld";
+import {
+  buildArticleSchema,
+  buildBreadcrumbSchema,
+  buildFaqSchema,
+} from "@/lib/schema";
 import { SITE } from "@/lib/site";
 
 type Params = { slug: string };
@@ -64,11 +71,25 @@ export default async function PostPage({
   const post = await getPostBySlug(slug);
   if (!post) notFound();
 
-  const related = await getRelated(post.id, post.categories?.[0], 3);
+  const [related, settings] = await Promise.all([
+    getRelated(post.id, post.categories?.[0], 3),
+    getSiteSettings(),
+  ]);
   const plain = lexicalToPlainParagraphs(post.body).join(" ");
+
+  const articleLd = buildArticleSchema(post, settings);
+  const breadcrumbLd = buildBreadcrumbSchema([
+    { name: "Início", href: "/" },
+    { name: "Blog", href: "/blog" },
+    { name: post.title, href: `/blog/${post.slug}` },
+  ]);
+  const faqLd = post.geo?.faq ? buildFaqSchema(post.geo.faq) : null;
 
   return (
     <article>
+      <JsonLd data={articleLd} />
+      <JsonLd data={breadcrumbLd} />
+      {faqLd && <JsonLd data={faqLd} />}
       {/* HERO */}
       <section className="relative isolate overflow-hidden border-b border-[var(--border)]">
         <div

@@ -5,7 +5,14 @@ import "./globals.css";
 
 import { Navbar } from "@/components/navbar";
 import { Footer } from "@/components/footer";
+import { JsonLd } from "@/components/json-ld";
 import { SITE } from "@/lib/site";
+import { getSiteSettings } from "@/lib/content";
+import {
+  buildOrganizationSchema,
+  buildWebsiteSchema,
+  buildLocalBusinessSchema,
+} from "@/lib/schema";
 
 // Display: Sora (geométrica corporate). Body: Inter (highly readable sans).
 const sora = Sora({
@@ -51,9 +58,14 @@ const themeBootstrap = `
 }catch(e){}})();
 `;
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
+  const settings = await getSiteSettings();
+  const orgLd = buildOrganizationSchema(settings);
+  const siteLd = buildWebsiteSchema(settings);
+  const bizLd = buildLocalBusinessSchema(settings);
+
   return (
     <html
       lang="pt-BR"
@@ -65,6 +77,9 @@ export default function RootLayout({
         <Script id="theme-bootstrap" strategy="beforeInteractive">
           {themeBootstrap}
         </Script>
+        <JsonLd data={orgLd} />
+        <JsonLd data={siteLd} />
+        {bizLd && <JsonLd data={bizLd} />}
       </head>
       <body className="min-h-full flex flex-col">
         <a

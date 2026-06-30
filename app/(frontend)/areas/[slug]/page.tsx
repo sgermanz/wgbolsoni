@@ -7,6 +7,8 @@ import { getAllAreas, getAreaBySlug } from "@/lib/content";
 import { Reveal } from "@/components/reveal";
 import { CTA } from "@/components/cta";
 import { RichBody } from "@/components/rich-body";
+import { JsonLd } from "@/components/json-ld";
+import { buildBreadcrumbSchema } from "@/lib/schema";
 import { SITE } from "@/lib/site";
 
 type Params = { slug: string };
@@ -53,8 +55,15 @@ export default async function AreaPage({
   const prev = areas[(idx - 1 + areas.length) % areas.length];
   const next = areas[(idx + 1) % areas.length];
 
+  const breadcrumb = buildBreadcrumbSchema([
+    { name: "Início", href: "/" },
+    { name: "Áreas de atuação", href: "/#areas" },
+    { name: area.title, href: `/areas/${area.slug}` },
+  ]);
+
   return (
     <>
+      <JsonLd data={breadcrumb} />
       {/* HERO da área */}
       <section className="relative isolate overflow-hidden border-b border-[var(--border)]">
         <div
