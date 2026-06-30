@@ -14,9 +14,42 @@ import { paragraphsToLexical } from "@/lib/lexical";
  * starts with the exact same content the public site already serves.
  */
 export async function seed(payload: Payload): Promise<void> {
+  await ensureSchema(payload);
   await seedAreas(payload);
   await seedPages(payload);
   await seedSiteSettings(payload);
+}
+
+/**
+ * The postgres adapter's `push: true` flag only auto-syncs the schema when
+ * Payload starts in dev mode. In production (NODE_ENV=production) the
+ * adapter expects migrations to have already been run, so on a fresh
+ * Railway DB the tables don't exist and the very first query fails.
+ *
+ * We sidestep that by calling `pushDevSchema` manually on every boot —
+ * it diffs the schema and applies only what's missing, so it's idempotent
+ * and safe to re-run.
+ */
+async function ensureSchema(payload: Payload): Promise<void> {
+  const db = payload.db as unknown as {
+    pushDevSchema?: () => Promise<void>;
+  };
+  if (typeof db.pushDevSchema !== "function") {
+    payload.logger.warn(
+      "[schema] adapter has no pushDevSchema — skipping (run migrations manually)",
+    );
+    return;
+  }
+  payload.logger.info("[schema] syncing Postgres schema (pushDevSchema)…");
+  try {
+    await db.pushDevSchema();
+    payload.logger.info("[schema] sync done");
+  } catch (error) {
+    payload.logger.error(
+      `[schema] pushDevSchema failed: ${(error as Error).message}`,
+    );
+    throw error;
+  }
 }
 
 async function seedAreas(payload: Payload) {
