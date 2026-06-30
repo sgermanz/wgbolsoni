@@ -16,6 +16,12 @@ export const Media: CollectionConfig = {
   admin: {
     useAsTitle: "filename",
   },
+  // Uploaded files must be publicly readable so the site (and next/image's
+  // optimizer) can fetch them without an admin session. Without this the
+  // default access requires auth and every media URL returns 403.
+  access: {
+    read: () => true,
+  },
   fields: [
     {
       name: "alt",

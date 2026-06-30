@@ -1,16 +1,36 @@
 import type { NextConfig } from "next";
 import { withPayload } from "@payloadcms/next/withPayload";
 
+// Payload serves uploaded media as absolute URLs built from
+// NEXT_PUBLIC_SERVER_URL (e.g. https://wgbolsoni-production.up.railway.app/api/media/file/x.jpg).
+// next/image refuses to optimize any host not in remotePatterns, so we must
+// allow our own domain. We derive it from the env var so this keeps working
+// when the site moves to a custom domain (wgbolsoni.net) — no code change,
+// just update the env var. The railway.app wildcard is a safety net for the
+// default Railway domain.
+const remotePatterns: NonNullable<
+  NonNullable<NextConfig["images"]>["remotePatterns"]
+> = [
+  { protocol: "https", hostname: "**.mpafoods.com" },
+  { protocol: "https", hostname: "**.chickenhpc85.com.br" },
+  { protocol: "https", hostname: "*.up.railway.app" },
+];
+
+const serverUrl = process.env.NEXT_PUBLIC_SERVER_URL;
+if (serverUrl) {
+  try {
+    const u = new URL(serverUrl);
+    remotePatterns.push({
+      protocol: u.protocol.replace(":", "") as "http" | "https",
+      hostname: u.hostname,
+    });
+  } catch {
+    // ignore malformed env value
+  }
+}
+
 const nextConfig: NextConfig = {
-  // Payload writes uploads to ./media and serves them via its own routes,
-  // so allow remote images from our own domain plus partner logos referenced
-  // in the institutional content.
-  images: {
-    remotePatterns: [
-      { protocol: "https", hostname: "**.mpafoods.com" },
-      { protocol: "https", hostname: "**.chickenhpc85.com.br" },
-    ],
-  },
+  images: { remotePatterns },
 };
 
 export default withPayload(nextConfig, { devBundleServerPackages: false });
