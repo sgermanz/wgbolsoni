@@ -16,6 +16,11 @@ type Params = { slug: string };
 
 export const dynamicParams = true;
 
+// Same rationale as the home page: avoid freezing on build-time fallback
+// data (no DB access during Railway's build step). ISR refreshes content
+// and cover images from the CMS without requiring a redeploy.
+export const revalidate = 60;
+
 export async function generateStaticParams() {
   const areas = await getAllAreas();
   return areas.map((a) => ({ slug: a.slug }));

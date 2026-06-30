@@ -8,6 +8,12 @@ import { SectionHeading } from "@/components/section-heading";
 import { CTA } from "@/components/cta";
 import { SITE } from "@/lib/site";
 
+// Without this the page is fully static-generated at build time. Railway's
+// build container can't reach the internal Postgres network, so the page
+// would freeze on the lib/areas.ts fallback (no cover images, stale text)
+// until the next code deploy. ISR lets it pick up CMS edits on its own.
+export const revalidate = 60;
+
 export default async function HomePage() {
   const areas = await getAllAreas();
 
