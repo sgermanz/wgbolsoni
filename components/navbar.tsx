@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { ChevronDown, Menu, X, Sun, Moon } from "lucide-react";
@@ -14,6 +15,12 @@ export function Navbar() {
   const [open, setOpen] = useState(false);              // mobile menu
   const [areasOpen, setAreasOpen] = useState(false);    // desktop dropdown
   const [dark, setDark] = useState(false);
+  const pathname = usePathname();
+
+  // Páginas de área têm hero com imagem escura de fundo: no topo (antes de
+  // rolar) os links precisam ser claros para não sumirem sobre a foto.
+  const onDarkHero = pathname?.startsWith("/areas/") ?? false;
+  const lightText = onDarkHero && !scrolled && !open;
 
   // Reage ao scroll: navbar transparente no topo, sólida ao descer.
   useEffect(() => {
@@ -35,17 +42,39 @@ export function Navbar() {
     setDark(next);
   };
 
+  const navLink = cn(
+    "rounded-lg px-3 py-2 text-sm font-medium transition",
+    lightText
+      ? "text-white/85 hover:text-white"
+      : "text-[var(--content-soft)] hover:text-[var(--content)]",
+  );
+
+  const iconBtn = cn(
+    "grid h-10 w-10 place-items-center rounded-lg transition",
+    lightText
+      ? "text-white/85 hover:bg-white/10 hover:text-white"
+      : "text-[var(--content-soft)] hover:bg-[var(--surface-2)] hover:text-[var(--content)]",
+  );
+
   return (
     <header
       className={cn(
         "fixed inset-x-0 top-0 z-50 border-b transition-colors duration-300",
         scrolled || open
           ? "border-[var(--border)] bg-[color-mix(in_oklab,var(--surface)_85%,transparent)] backdrop-blur-xl"
-          : "border-transparent bg-transparent",
+          : lightText
+            ? "border-transparent bg-gradient-to-b from-black/45 to-transparent"
+            : "border-transparent bg-transparent",
       )}
     >
       <nav className="mx-auto flex h-16 max-w-7xl items-center justify-between gap-6 px-5 lg:h-20 lg:px-8" aria-label="Principal">
-        <Link href="/" className="flex items-center gap-2.5 font-display text-lg font-bold tracking-tight">
+        <Link
+          href="/"
+          className={cn(
+            "flex items-center gap-2.5 font-display text-lg font-bold tracking-tight transition-colors",
+            lightText && "text-white",
+          )}
+        >
           <span className="grid h-9 w-9 place-items-center rounded-lg bg-brand-600 text-white text-sm">WG</span>
           <span className="hidden sm:inline">{SITE.name}</span>
         </Link>
@@ -53,11 +82,7 @@ export function Navbar() {
         {/* Navegação desktop */}
         <div className="hidden items-center gap-1 lg:flex">
           {NAV_TOP.filter(n => n.href !== "/contato").map((item) => (
-            <Link
-              key={item.href}
-              href={item.href}
-              className="rounded-lg px-3 py-2 text-sm font-medium text-[var(--content-soft)] transition hover:text-[var(--content)]"
-            >
+            <Link key={item.href} href={item.href} className={navLink}>
               {item.label}
             </Link>
           ))}
@@ -69,7 +94,7 @@ export function Navbar() {
             onMouseLeave={() => setAreasOpen(false)}
           >
             <button
-              className="flex items-center gap-1 rounded-lg px-3 py-2 text-sm font-medium text-[var(--content-soft)] transition hover:text-[var(--content)]"
+              className={cn(navLink, "flex items-center gap-1")}
               aria-expanded={areasOpen}
               onClick={() => setAreasOpen(v => !v)}
             >
@@ -111,7 +136,7 @@ export function Navbar() {
           <button
             type="button"
             onClick={toggleTheme}
-            className="grid h-10 w-10 place-items-center rounded-lg text-[var(--content-soft)] transition hover:bg-[var(--surface-2)] hover:text-[var(--content)]"
+            className={iconBtn}
             aria-label="Alternar tema"
           >
             {dark ? <Moon className="h-5 w-5" /> : <Sun className="h-5 w-5" />}
@@ -127,7 +152,7 @@ export function Navbar() {
           <button
             type="button"
             onClick={() => setOpen(v => !v)}
-            className="grid h-10 w-10 place-items-center rounded-lg lg:hidden"
+            className={cn(iconBtn, "lg:hidden")}
             aria-expanded={open}
             aria-label="Abrir menu"
           >
