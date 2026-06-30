@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 
@@ -74,13 +75,25 @@ export default async function HomePage() {
             <Reveal key={area.slug} delay={(i % 3) * 0.06}>
               <Link
                 href={`/areas/${area.slug}`}
-                className="group relative flex h-full flex-col overflow-hidden rounded-2xl border border-[var(--border)] bg-[var(--surface-2)] p-7 transition duration-500 hover:-translate-y-1 hover:shadow-2xl"
+                className="group relative flex h-full flex-col overflow-hidden rounded-2xl border border-[var(--border)] bg-[var(--surface-2)] transition duration-500 hover:-translate-y-1 hover:shadow-2xl"
               >
-                <div
-                  aria-hidden
-                  className="absolute -right-12 -top-12 h-40 w-40 rounded-full bg-brand-500/10 blur-2xl transition-all duration-500 group-hover:scale-150 group-hover:bg-brand-500/20"
-                />
-                <div className="relative">
+                {area.cover ? (
+                  <div className="relative aspect-[16/9] overflow-hidden">
+                    <Image
+                      src={area.cover.url}
+                      alt={area.cover.alt}
+                      fill
+                      sizes="(min-width: 1024px) 33vw, (min-width: 768px) 50vw, 100vw"
+                      className="object-cover transition duration-700 group-hover:scale-105"
+                    />
+                  </div>
+                ) : (
+                  <div
+                    aria-hidden
+                    className="absolute -right-12 -top-12 h-40 w-40 rounded-full bg-brand-500/10 blur-2xl transition-all duration-500 group-hover:scale-150 group-hover:bg-brand-500/20"
+                  />
+                )}
+                <div className="relative flex flex-1 flex-col p-7">
                   <div className="flex items-center justify-between">
                     <span className="text-xs font-semibold uppercase tracking-wider text-accent-500">
                       0{i + 1 < 10 ? i + 1 : i + 1}

@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ArrowUpRight, ArrowLeft } from "lucide-react";
@@ -101,6 +102,22 @@ export default async function AreaPage({
           </Reveal>
         </div>
       </section>
+
+      {/* CAPA */}
+      {area.cover && (
+        <div className="mx-auto -mt-2 max-w-5xl px-5 lg:px-8">
+          <div className="relative aspect-[16/9] overflow-hidden rounded-2xl border border-[var(--border)]">
+            <Image
+              src={area.cover.url}
+              alt={area.cover.alt}
+              fill
+              sizes="(min-width: 1024px) 1024px, 100vw"
+              priority
+              className="object-cover"
+            />
+          </div>
+        </div>
+      )}
 
       {/* CORPO */}
       <section className="mx-auto max-w-3xl px-5 py-16 lg:px-8 lg:py-24">

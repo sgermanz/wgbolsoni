@@ -10,6 +10,12 @@ import { withFallback } from "@/lib/cms";
 
 export type AreaLink = { label: string; href: string; external?: boolean };
 export type AreaSubitem = { title: string; body: string };
+export type AreaCover = {
+  url: string;
+  alt: string;
+  width?: number;
+  height?: number;
+};
 
 export type AreaRecord = {
   id?: string | number;
@@ -22,6 +28,7 @@ export type AreaRecord = {
   bodyParagraphs?: string[];
   links?: AreaLink[];
   subitems?: AreaSubitem[];
+  cover?: AreaCover;
 };
 
 export type PageRecord = {
@@ -75,18 +82,41 @@ type PayloadArea = {
   body?: SerializedEditorState | null;
   links?: AreaLink[] | null;
   subitems?: AreaSubitem[] | null;
+  coverImage?:
+    | {
+        url?: string | null;
+        alt?: string | null;
+        width?: number | null;
+        height?: number | null;
+      }
+    | string
+    | number
+    | null;
 };
 
-const fromPayloadArea = (a: PayloadArea): AreaRecord => ({
-  id: a.id,
-  slug: a.slug,
-  title: a.title,
-  tag: a.tag ?? undefined,
-  short: a.short,
-  bodyLexical: a.body ?? undefined,
-  links: a.links ?? undefined,
-  subitems: a.subitems ?? undefined,
-});
+const fromPayloadArea = (a: PayloadArea): AreaRecord => {
+  const cover =
+    typeof a.coverImage === "object" && a.coverImage?.url
+      ? {
+          url: a.coverImage.url,
+          alt: a.coverImage.alt || a.title,
+          width: a.coverImage.width ?? undefined,
+          height: a.coverImage.height ?? undefined,
+        }
+      : undefined;
+
+  return {
+    id: a.id,
+    slug: a.slug,
+    title: a.title,
+    tag: a.tag ?? undefined,
+    short: a.short,
+    bodyLexical: a.body ?? undefined,
+    links: a.links ?? undefined,
+    subitems: a.subitems ?? undefined,
+    cover,
+  };
+};
 
 /* ----------------------------- Public API --------------------------------- */
 
