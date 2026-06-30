@@ -76,7 +76,7 @@ export default async function AreaPage({
       <section
         className={
           hasCover
-            ? "relative isolate flex min-h-[60vh] flex-col justify-end overflow-hidden border-b border-[var(--border)] lg:min-h-[68vh]"
+            ? "relative isolate flex min-h-[60vh] flex-col justify-end overflow-hidden lg:min-h-[68vh]"
             : "relative isolate overflow-hidden border-b border-[var(--border)]"
         }
       >
