@@ -47,6 +47,9 @@ export default buildConfig({
   editor: lexicalEditor(),
   db: postgresAdapter({
     pool: { connectionString: databaseURI },
+    // Schema is defined in `cms/collections/*` and synced automatically.
+    // Disable later by committing migration files and running `payload migrate`.
+    push: true,
   }),
   sharp,
   email: process.env.SMTP_HOST
