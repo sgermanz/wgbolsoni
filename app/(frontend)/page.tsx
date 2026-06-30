@@ -1,13 +1,15 @@
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 
-import { AREAS } from "@/lib/areas";
+import { getAllAreas } from "@/lib/content";
 import { Reveal } from "@/components/reveal";
 import { SectionHeading } from "@/components/section-heading";
 import { CTA } from "@/components/cta";
 import { SITE } from "@/lib/site";
 
-export default function HomePage() {
+export default async function HomePage() {
+  const areas = await getAllAreas();
+
   return (
     <>
       {/* ===================== HERO ===================== */}
@@ -63,12 +65,12 @@ export default function HomePage() {
       >
         <SectionHeading
           eyebrow="Áreas de atuação"
-          title="11 frentes que se conectam"
+          title={`${areas.length} frentes que se conectam`}
           subtitle="Cada uma delas com história, parceiros e estratégia próprios — e todas alinhadas à agenda ambiental e produtiva do grupo."
         />
 
         <div className="mt-14 grid gap-5 md:grid-cols-2 lg:grid-cols-3">
-          {AREAS.map((area, i) => (
+          {areas.map((area, i) => (
             <Reveal key={area.slug} delay={(i % 3) * 0.06}>
               <Link
                 href={`/areas/${area.slug}`}
