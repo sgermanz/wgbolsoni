@@ -67,20 +67,51 @@ export default async function AreaPage({
     { name: area.title, href: `/areas/${area.slug}` },
   ]);
 
+  const hasCover = Boolean(area.cover);
+
   return (
     <>
       <JsonLd data={breadcrumb} />
-      {/* HERO da área */}
-      <section className="relative isolate overflow-hidden border-b border-[var(--border)]">
-        <div
-          aria-hidden
-          className="gradient-mesh absolute inset-0 -z-10 opacity-40 dark:opacity-25"
-        />
-        <div className="mx-auto max-w-7xl px-5 pb-16 pt-36 lg:px-8 lg:pb-20 lg:pt-44">
+      {/* HERO da área — com imagem de fundo + máscara quando há capa */}
+      <section
+        className={
+          hasCover
+            ? "relative isolate flex min-h-[60vh] flex-col justify-end overflow-hidden border-b border-[var(--border)] lg:min-h-[68vh]"
+            : "relative isolate overflow-hidden border-b border-[var(--border)]"
+        }
+      >
+        {hasCover ? (
+          <>
+            <Image
+              src={area.cover!.url}
+              alt={area.cover!.alt}
+              fill
+              sizes="100vw"
+              priority
+              className="absolute inset-0 -z-20 object-cover"
+            />
+            {/* Máscara: escurece de baixo (texto) para cima, garantindo leitura */}
+            <div
+              aria-hidden
+              className="absolute inset-0 -z-10 bg-gradient-to-t from-black/85 via-black/55 to-black/30"
+            />
+          </>
+        ) : (
+          <div
+            aria-hidden
+            className="gradient-mesh absolute inset-0 -z-10 opacity-40 dark:opacity-25"
+          />
+        )}
+
+        <div className="mx-auto w-full max-w-7xl px-5 pb-14 pt-36 lg:px-8 lg:pb-20 lg:pt-44">
           <Reveal>
             <Link
               href="/#areas"
-              className="mb-5 inline-flex items-center gap-2 text-sm font-medium text-[var(--content-soft)] transition hover:text-[var(--content)]"
+              className={
+                hasCover
+                  ? "mb-5 inline-flex items-center gap-2 text-sm font-medium text-white/75 transition hover:text-white"
+                  : "mb-5 inline-flex items-center gap-2 text-sm font-medium text-[var(--content-soft)] transition hover:text-[var(--content)]"
+              }
             >
               <ArrowLeft className="h-4 w-4" />
               Todas as áreas
@@ -88,41 +119,43 @@ export default async function AreaPage({
           </Reveal>
 
           <Reveal>
-            <p className="mb-3 inline-flex items-center gap-2 text-sm font-semibold uppercase tracking-wider text-brand-600 dark:text-brand-300">
-              <span className="h-px w-6 bg-brand-500" />
+            <p
+              className={
+                hasCover
+                  ? "mb-3 inline-flex items-center gap-2 text-sm font-semibold uppercase tracking-wider text-brand-200"
+                  : "mb-3 inline-flex items-center gap-2 text-sm font-semibold uppercase tracking-wider text-brand-600 dark:text-brand-300"
+              }
+            >
+              <span className="h-px w-6 bg-brand-400" />
               Áreas de atuação
             </p>
           </Reveal>
 
           <Reveal delay={0.05}>
-            <h1 className="text-balance max-w-4xl font-display text-[length:var(--text-fluid-3xl)] font-extrabold leading-[1.02]">
+            <h1
+              className={
+                hasCover
+                  ? "text-balance max-w-4xl font-display text-[length:var(--text-fluid-3xl)] font-extrabold leading-[1.02] text-white drop-shadow-sm"
+                  : "text-balance max-w-4xl font-display text-[length:var(--text-fluid-3xl)] font-extrabold leading-[1.02]"
+              }
+            >
               {area.title}
             </h1>
           </Reveal>
 
           <Reveal delay={0.1}>
-            <p className="text-pretty mt-6 max-w-2xl text-[length:var(--text-fluid-lg)] text-[var(--content-soft)]">
+            <p
+              className={
+                hasCover
+                  ? "text-pretty mt-6 max-w-2xl text-[length:var(--text-fluid-lg)] text-white/85"
+                  : "text-pretty mt-6 max-w-2xl text-[length:var(--text-fluid-lg)] text-[var(--content-soft)]"
+              }
+            >
               {area.short}
             </p>
           </Reveal>
         </div>
       </section>
-
-      {/* CAPA */}
-      {area.cover && (
-        <div className="mx-auto -mt-2 max-w-5xl px-5 lg:px-8">
-          <div className="relative aspect-[16/9] overflow-hidden rounded-2xl border border-[var(--border)]">
-            <Image
-              src={area.cover.url}
-              alt={area.cover.alt}
-              fill
-              sizes="(min-width: 1024px) 1024px, 100vw"
-              priority
-              className="object-cover"
-            />
-          </div>
-        </div>
-      )}
 
       {/* CORPO */}
       <section className="mx-auto max-w-3xl px-5 py-16 lg:px-8 lg:py-24">
