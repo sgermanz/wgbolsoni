@@ -35,6 +35,14 @@ export default buildConfig({
     user: Users.slug,
     importMap: { baseDir: path.resolve(dirname) },
     meta: { titleSuffix: "— WG Bolsoni" },
+    components: {
+      views: {
+        analytics: {
+          Component: "@/cms/views/AnalyticsView#default",
+          path: "/analytics",
+        },
+      },
+    },
   },
   editor: lexicalEditor(),
   db: postgresAdapter({
