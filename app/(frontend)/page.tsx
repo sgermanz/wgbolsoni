@@ -84,7 +84,7 @@ export default async function HomePage() {
                 className="group relative flex h-full flex-col overflow-hidden rounded-2xl border border-[var(--border)] bg-[var(--surface-2)] transition duration-500 hover:-translate-y-1 hover:shadow-2xl"
               >
                 {area.cover ? (
-                  <div className="relative aspect-[16/9] overflow-hidden">
+                  <div className="relative aspect-[16/9] w-full shrink-0 overflow-hidden">
                     <Image
                       src={area.cover.url}
                       alt={area.cover.alt}
