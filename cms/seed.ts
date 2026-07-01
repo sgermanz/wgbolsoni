@@ -5,7 +5,62 @@ import { pushDevSchema } from "@payloadcms/drizzle";
 
 import { AREAS } from "@/lib/areas";
 import { SITE, NAV_TOP } from "@/lib/site";
-import { paragraphsToLexical } from "@/lib/lexical";
+import {
+  paragraphsToLexical,
+  buildLexical,
+  lexParagraph,
+  lexHeading,
+  lexBulletList,
+  lexicalToPlainParagraphs,
+} from "@/lib/lexical";
+
+/**
+ * The full Conceito body, mirroring the rich content the /conceito page used
+ * to hardcode (intro + "O que orienta nossas decisões" list + "Nossa visão").
+ * Stored in the CMS so editors control the page text; the page renders this
+ * and keeps the same JSX as an offline fallback. Keep the two in sync.
+ */
+const CONCEITO_BODY = buildLexical([
+  lexParagraph(
+    "A WG Bolsoni é uma holding de participações que atua em múltiplas frentes — agronegócio, energia, meio ambiente, indústria e novas fronteiras como proteína de alto valor biológico e ativos ambientais.",
+  ),
+  lexParagraph(
+    "Em vez de operar em um único setor, escolhemos negócios em que nossa visão setorial, rede de relacionamento e capacidade de execução criam vantagem competitiva real — e em que conseguimos contribuir além do capital, com governança e estratégia.",
+  ),
+  lexHeading("O que orienta nossas decisões"),
+  lexBulletList([
+    [
+      { text: "Longo prazo.", bold: true },
+      {
+        text: " Privilegiamos teses estruturais a modas passageiras. Plantar uma floresta, montar um negócio de proteína global ou estruturar um título financeiro lastreado em conservação são apostas de anos, não de semestres.",
+      },
+    ],
+    [
+      { text: "Convergência ambiental e produtiva.", bold: true },
+      {
+        text: " Cada vez mais, geração de valor passa por sustentabilidade — não como discurso, mas como modelo de negócio. CPR Verde, biomassa, biocombustíveis e proteína de alto valor biológico são exemplos disso.",
+      },
+    ],
+    [
+      { text: "Execução com governança.", bold: true },
+      {
+        text: " Investimos em pessoas e em estruturas que sustentem a operação no tempo, com clareza de papéis e disciplina financeira.",
+      },
+    ],
+  ]),
+  lexHeading("Nossa visão"),
+  lexParagraph(
+    "Ser referência em construir e participar de negócios que conectam o agronegócio brasileiro ao mundo, gerando renda, segurança alimentar e contribuição efetiva para a redução de emissões — sem romantismo e sem sacrificar competitividade.",
+  ),
+]);
+
+/**
+ * Distinctive phrase from the *old* short seed body. The backfill only fires
+ * when it finds this exact legacy text, so it replaces the placeholder once
+ * and never touches a fresh-seeded body or an editor's later edits.
+ */
+const CONCEITO_LEGACY_MARKER =
+  "nasceu como holding de participações em 2016";
 
 /**
  * Idempotent seed runner. Called from `onInit` in payload.config.ts on every
@@ -20,8 +75,46 @@ export async function seed(payload: Payload): Promise<void> {
   await ensureSchema(payload);
   await seedAreas(payload);
   await seedPages(payload);
+  await backfillConceitoBody(payload);
   await seedSiteSettings(payload);
   await seedHomeHero(payload);
+}
+
+/**
+ * One-time content migration: the /conceito page used to hardcode its body,
+ * so the seeded CMS body was a short placeholder that the page ignored. Now
+ * that the page renders the CMS body, backfill the full rich content so the
+ * page looks identical while becoming fully editable.
+ *
+ * Idempotent and non-destructive: it only writes when the body still contains
+ * the old placeholder text, so it fires once and never touches a fresh-seeded
+ * body or an editor's later edits.
+ */
+async function backfillConceitoBody(payload: Payload): Promise<void> {
+  try {
+    const res = await payload.find({
+      collection: "pages",
+      where: { slug: { equals: "conceito" } },
+      limit: 1,
+      pagination: false,
+    });
+    const doc = res.docs[0] as { id: string | number; body?: unknown } | undefined;
+    if (!doc) return;
+
+    const plain = lexicalToPlainParagraphs(doc.body as never).join(" ");
+    if (!plain.includes(CONCEITO_LEGACY_MARKER)) return; // fresh/edited — leave it
+
+    await payload.update({
+      collection: "pages",
+      id: doc.id,
+      data: { body: CONCEITO_BODY } as never,
+    });
+    payload.logger.info("[seed] conceito body: migrated legacy placeholder");
+  } catch (error) {
+    payload.logger.warn(
+      `[seed] conceito body backfill skipped: ${(error as Error).message}`,
+    );
+  }
 }
 
 /**
@@ -110,12 +203,6 @@ async function seedPages(payload: Payload) {
   });
   if (existing.docs.length > 0) return;
 
-  const conceito = [
-    "A WG Bolsoni nasceu como holding de participações em 2016, com a missão de conectar capital, governança e visão setorial a empresas em cadeias produtivas que combinam relevância econômica, agenda ambiental e potencial de expansão.",
-    "O grupo opera em frentes que vão do agronegócio à indústria de base — proteína, florestamento, biomassa, alcoolquímica, biocombustíveis, energia, gaseificação de resíduos, fibras celulósicas, meio ambiente e novas frentes digitais — sempre com o mesmo princípio: investir onde conseguimos ajudar a construir e onde a sustentabilidade é parte do plano, não um anexo.",
-    "Cada participação carrega o nome WG Bolsoni junto: não somos apenas capital, somos sócios de jornada.",
-  ];
-
   const politicas = [
     "A WG Bolsoni atua sob princípios claros de ética, conformidade e responsabilidade. Estes princípios guiam as decisões de investimento, a relação com sócios e parceiros e o dia a dia das empresas em que participamos.",
     "Sustentabilidade — Toda nova frente é avaliada também pelo impacto ambiental e social. A pauta ESG não é discurso: dirige a alocação de capital.",
@@ -131,7 +218,7 @@ async function seedPages(payload: Payload) {
       slug: "conceito",
       subtitle:
         "Holding de participações desde 2016 — capital, governança e visão setorial.",
-      body: paragraphsToLexical(conceito),
+      body: CONCEITO_BODY,
     } as never,
   });
 

@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 import { Reveal } from "@/components/reveal";
+import { RichBody } from "@/components/rich-body";
 import { getPageBySlug } from "@/lib/content";
 
 export const metadata: Metadata = {
@@ -62,50 +63,59 @@ export default async function ConceitoPage() {
           )}
 
           <Reveal delay={cover ? 0.05 : 0}>
-            <div className="prose">
-              <p>
-                A WG Bolsoni é uma holding de participações que atua em múltiplas
-                frentes — agronegócio, energia, meio ambiente, indústria e novas
-                fronteiras como proteína de alto valor biológico e ativos
-                ambientais.
-              </p>
-              <p>
-                Em vez de operar em um único setor, escolhemos negócios em que
-                nossa visão setorial, rede de relacionamento e capacidade de
-                execução criam vantagem competitiva real — e em que conseguimos
-                contribuir além do capital, com governança e estratégia.
-              </p>
+            {page?.bodyLexical ? (
+              // Texto gerenciado pelo CMS (Páginas → Conceito → Body).
+              <RichBody lexical={page.bodyLexical} />
+            ) : (
+              // Fallback offline — usado só se o CMS estiver indisponível.
+              // Mantém o mesmo conteúdo do body do CMS; manter em sincronia.
+              <div className="prose">
+                <p>
+                  A WG Bolsoni é uma holding de participações que atua em
+                  múltiplas frentes — agronegócio, energia, meio ambiente,
+                  indústria e novas fronteiras como proteína de alto valor
+                  biológico e ativos ambientais.
+                </p>
+                <p>
+                  Em vez de operar em um único setor, escolhemos negócios em que
+                  nossa visão setorial, rede de relacionamento e capacidade de
+                  execução criam vantagem competitiva real — e em que
+                  conseguimos contribuir além do capital, com governança e
+                  estratégia.
+                </p>
 
-              <h2>O que orienta nossas decisões</h2>
-              <ul>
-                <li>
-                  <strong>Longo prazo.</strong> Privilegiamos teses estruturais a
-                  modas passageiras. Plantar uma floresta, montar um negócio de
-                  proteína global ou estruturar um título financeiro lastreado em
-                  conservação são apostas de anos, não de semestres.
-                </li>
-                <li>
-                  <strong>Convergência ambiental e produtiva.</strong> Cada vez
-                  mais, geração de valor passa por sustentabilidade — não como
-                  discurso, mas como modelo de negócio. CPR Verde, biomassa,
-                  biocombustíveis e proteína de alto valor biológico são exemplos
-                  disso.
-                </li>
-                <li>
-                  <strong>Execução com governança.</strong> Investimos em pessoas
-                  e em estruturas que sustentem a operação no tempo, com clareza
-                  de papéis e disciplina financeira.
-                </li>
-              </ul>
+                <h2>O que orienta nossas decisões</h2>
+                <ul>
+                  <li>
+                    <strong>Longo prazo.</strong> Privilegiamos teses
+                    estruturais a modas passageiras. Plantar uma floresta,
+                    montar um negócio de proteína global ou estruturar um título
+                    financeiro lastreado em conservação são apostas de anos, não
+                    de semestres.
+                  </li>
+                  <li>
+                    <strong>Convergência ambiental e produtiva.</strong> Cada
+                    vez mais, geração de valor passa por sustentabilidade — não
+                    como discurso, mas como modelo de negócio. CPR Verde,
+                    biomassa, biocombustíveis e proteína de alto valor biológico
+                    são exemplos disso.
+                  </li>
+                  <li>
+                    <strong>Execução com governança.</strong> Investimos em
+                    pessoas e em estruturas que sustentem a operação no tempo,
+                    com clareza de papéis e disciplina financeira.
+                  </li>
+                </ul>
 
-              <h2>Nossa visão</h2>
-              <p>
-                Ser referência em construir e participar de negócios que conectam
-                o agronegócio brasileiro ao mundo, gerando renda, segurança
-                alimentar e contribuição efetiva para a redução de emissões — sem
-                romantismo e sem sacrificar competitividade.
-              </p>
-            </div>
+                <h2>Nossa visão</h2>
+                <p>
+                  Ser referência em construir e participar de negócios que
+                  conectam o agronegócio brasileiro ao mundo, gerando renda,
+                  segurança alimentar e contribuição efetiva para a redução de
+                  emissões — sem romantismo e sem sacrificar competitividade.
+                </p>
+              </div>
+            )}
           </Reveal>
         </div>
       </section>
