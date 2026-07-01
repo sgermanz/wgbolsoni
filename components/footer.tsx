@@ -9,9 +9,9 @@ export function Footer() {
         <div className="grid gap-12 md:grid-cols-2 lg:grid-cols-4">
           {/* Marca */}
           <div>
-            <Link href="/" className="flex items-center gap-2.5 font-display text-lg font-bold">
-              <span className="grid h-9 w-9 place-items-center rounded-lg bg-brand-600 text-white text-sm">WG</span>
-              {SITE.name}
+            <Link href="/" aria-label={SITE.name} className="inline-flex items-center">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src="/logo.svg" alt={SITE.name} className="h-9 w-auto" />
             </Link>
             <p className="text-pretty mt-4 max-w-xs text-sm text-[var(--content-soft)]">
               {SITE.tagline}

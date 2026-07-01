@@ -59,24 +59,25 @@ export function Navbar() {
   return (
     <header
       className={cn(
-        "fixed inset-x-0 top-0 z-50 border-b transition-colors duration-300",
+        "fixed inset-x-0 top-0 z-50 transition-colors duration-300",
         scrolled || open
-          ? "border-[var(--border)] bg-[color-mix(in_oklab,var(--surface)_85%,transparent)] backdrop-blur-xl"
+          ? "bg-[color-mix(in_oklab,var(--surface)_85%,transparent)] backdrop-blur-xl"
           : lightText
-            ? "border-transparent bg-gradient-to-b from-black/45 to-transparent"
-            : "border-transparent bg-transparent",
+            ? "bg-gradient-to-b from-black/45 to-transparent"
+            : "bg-transparent",
       )}
     >
       <nav className="mx-auto flex h-16 max-w-7xl items-center justify-between gap-6 px-5 lg:h-20 lg:px-8" aria-label="Principal">
-        <Link
-          href="/"
-          className={cn(
-            "flex items-center gap-2.5 font-display text-lg font-bold tracking-tight transition-colors",
-            lightText && "text-white",
-          )}
-        >
-          <span className="grid h-9 w-9 place-items-center rounded-lg bg-brand-600 text-white text-sm">WG</span>
-          <span className="hidden sm:inline">{SITE.name}</span>
+        <Link href="/" aria-label={SITE.name} className="flex items-center">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src="/logo.svg"
+            alt={SITE.name}
+            className={cn(
+              "h-8 w-auto lg:h-9",
+              lightText && "drop-shadow-[0_1px_10px_rgba(255,255,255,0.35)]",
+            )}
+          />
         </Link>
 
         {/* Navegação desktop */}
