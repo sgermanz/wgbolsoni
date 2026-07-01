@@ -3,18 +3,22 @@ import "server-only";
 import { SITE } from "@/lib/site";
 import { withFallback } from "@/lib/cms";
 
+import type { HeroOverlayEffectType } from "@/components/hero-overlay-effect";
+
 export type HeroBackground =
   | { type: "none" }
-  | { type: "image"; url: string; alt: string }
+  | { type: "image"; url: string; alt: string; effect: HeroOverlayEffectType }
   | {
       type: "video";
       url: string;
       poster?: string;
+      effect: HeroOverlayEffectType;
     }
   | {
       type: "youtube";
       url: string;
       poster?: string;
+      effect: HeroOverlayEffectType;
     };
 
 export type HeroSlide = {
@@ -73,22 +77,24 @@ type PayloadSlide = {
     videoFile?: MediaRef;
     videoUrl?: string | null;
     posterImage?: MediaRef;
+    overlayEffect?: HeroOverlayEffectType | null;
   } | null;
 };
 
 function toBackground(bg: PayloadSlide["background"]): HeroBackground {
   const type = bg?.type ?? "none";
   const poster = mediaUrl(bg?.posterImage);
+  const effect = bg?.overlayEffect ?? "none";
   if (type === "image") {
     const url = mediaUrl(bg?.image);
-    if (url) return { type: "image", url, alt: mediaAlt(bg?.image) ?? "" };
+    if (url) return { type: "image", url, alt: mediaAlt(bg?.image) ?? "", effect };
   }
   if (type === "video") {
     const url = mediaUrl(bg?.videoFile);
-    if (url) return { type: "video", url, poster };
+    if (url) return { type: "video", url, poster, effect };
   }
   if (type === "youtube") {
-    if (bg?.videoUrl) return { type: "youtube", url: bg.videoUrl, poster };
+    if (bg?.videoUrl) return { type: "youtube", url: bg.videoUrl, poster, effect };
   }
   return { type: "none" };
 }

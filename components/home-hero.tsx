@@ -9,6 +9,10 @@ import { ArrowRight, ArrowUpRight, ChevronLeft, ChevronRight } from "lucide-reac
 import type { HeroSlide, HomeHeroData } from "@/lib/home";
 import { toBackgroundEmbedUrl } from "@/lib/embed";
 import { cn } from "@/lib/utils";
+import {
+  HeroOverlayEffect,
+  heroMediaFilterClass,
+} from "@/components/hero-overlay-effect";
 
 function isExternal(href: string) {
   return /^https?:\/\//.test(href);
@@ -62,8 +66,12 @@ function SlideBackground({ slide }: { slide: HeroSlide }) {
           fill
           priority
           sizes="100vw"
-          className="absolute inset-0 -z-20 object-cover"
+          className={cn(
+            "absolute inset-0 -z-20 object-cover",
+            heroMediaFilterClass(bg.effect),
+          )}
         />
+        <HeroOverlayEffect effect={bg.effect} />
         <div
           aria-hidden
           className="absolute inset-0 -z-10 bg-gradient-to-t from-black/85 via-black/55 to-black/35"
@@ -76,7 +84,10 @@ function SlideBackground({ slide }: { slide: HeroSlide }) {
     return (
       <>
         <video
-          className="absolute inset-0 -z-20 h-full w-full object-cover"
+          className={cn(
+            "absolute inset-0 -z-20 h-full w-full object-cover",
+            heroMediaFilterClass(bg.effect),
+          )}
           autoPlay
           muted
           loop
@@ -85,6 +96,7 @@ function SlideBackground({ slide }: { slide: HeroSlide }) {
         >
           <source src={bg.url} />
         </video>
+        <HeroOverlayEffect effect={bg.effect} />
         <div
           aria-hidden
           className="absolute inset-0 -z-10 bg-gradient-to-t from-black/85 via-black/55 to-black/35"
@@ -104,12 +116,20 @@ function SlideBackground({ slide }: { slide: HeroSlide }) {
             fill
             priority
             sizes="100vw"
-            className="absolute inset-0 -z-30 object-cover"
+            className={cn(
+              "absolute inset-0 -z-30 object-cover",
+              heroMediaFilterClass(bg.effect),
+            )}
           />
         )}
         {embed && (
           // 16:9 video scaled to cover the hero, centered, pointer-events off.
-          <div className="pointer-events-none absolute inset-0 -z-20 overflow-hidden">
+          <div
+            className={cn(
+              "pointer-events-none absolute inset-0 -z-20 overflow-hidden",
+              heroMediaFilterClass(bg.effect),
+            )}
+          >
             <iframe
               src={embed}
               allow="autoplay; encrypted-media; picture-in-picture"
@@ -119,6 +139,7 @@ function SlideBackground({ slide }: { slide: HeroSlide }) {
             />
           </div>
         )}
+        <HeroOverlayEffect effect={bg.effect} />
         <div
           aria-hidden
           className="absolute inset-0 -z-10 bg-gradient-to-t from-black/85 via-black/55 to-black/35"

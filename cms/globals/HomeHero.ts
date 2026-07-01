@@ -146,6 +146,23 @@ export const HomeHero: GlobalConfig = {
                   "Mostrada enquanto o vídeo carrega. Recomendado para não piscar.",
               },
             },
+            {
+              name: "overlayEffect",
+              type: "select",
+              label: "Efeito por cima da mídia",
+              defaultValue: "none",
+              options: [
+                { label: "Nenhum", value: "none" },
+                { label: "Grão de filme", value: "grain" },
+                { label: "Duotone (cor da marca)", value: "duotone" },
+                { label: "Vinheta", value: "vignette" },
+              ],
+              admin: {
+                condition: (_, siblingData) => siblingData?.type !== "none",
+                description:
+                  "Um filtro visual aplicado por cima da imagem/vídeo. Troque a foto quando quiser — o efeito continua igual.",
+              },
+            },
           ],
         },
       ],
