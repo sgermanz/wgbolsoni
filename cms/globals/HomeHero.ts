@@ -156,6 +156,7 @@ export const HomeHero: GlobalConfig = {
                 { label: "Grão de filme", value: "grain" },
                 { label: "Duotone (cor da marca)", value: "duotone" },
                 { label: "Vinheta", value: "vignette" },
+                { label: "Partículas suaves", value: "particles" },
               ],
               admin: {
                 condition: (_, siblingData) => siblingData?.type !== "none",
