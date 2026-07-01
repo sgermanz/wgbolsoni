@@ -1,8 +1,105 @@
 /* Custom admin styling. Loaded only inside the (payload) route group, so
- * nothing here can affect the public site. Keep brand alignment minimal —
- * the goal is a familiar Payload UX, not a redesign. */
+ * nothing here can affect the public site. Payload's own CSS lives inside
+ * the `payload-default` @layer, so plain (unlayered) rules here win over it
+ * automatically without needing !important — that's why this file works as
+ * a thin set of overrides instead of a full rewrite. */
 
 :root {
+  --wgb-brand: #2f8049;
+  --wgb-brand-dark: #21602f;
+  --wgb-brand-tint: #eaf3ee;
+
   --theme-elevation-50: #f7faf8;
   --theme-success-500: #2f8049; /* brand green */
+}
+
+/* ---------- Primary buttons (Save / Create / Publish): brand color ---------- */
+.btn--style-primary:not(.btn--disabled) {
+  --bg-color: var(--wgb-brand);
+  --hover-bg: var(--wgb-brand-dark);
+}
+
+/* ---------- Field labels: clearer hierarchy over the input ---------- */
+.field-label {
+  font-weight: 600;
+  color: var(--theme-elevation-800);
+  margin-bottom: 6px;
+}
+
+/* ---------- Helper text: default gray was too low-contrast to read ---------- */
+.field-description {
+  color: var(--theme-elevation-600);
+}
+
+/* ---------- Sidebar navigation ---------- */
+.nav-group__label,
+.nav-group__toggle {
+  color: var(--theme-elevation-600);
+}
+
+.nav-group__label {
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  font-size: 11px;
+}
+
+.nav__link {
+  padding-top: 7px;
+  padding-bottom: 7px;
+  padding-left: 10px;
+  border-radius: 6px;
+  margin-bottom: 2px;
+  transition: background-color 0.15s ease;
+}
+
+.nav__link:hover {
+  background: var(--wgb-brand-tint);
+}
+
+.nav__link--active {
+  background: var(--wgb-brand-tint);
+  font-weight: 600;
+}
+
+/* ---------- Inputs: firmer border + on-brand focus ring ---------- */
+input[type="text"],
+input[type="email"],
+input[type="number"],
+input[type="password"],
+input[type="date"],
+textarea,
+select {
+  border-color: var(--theme-elevation-200);
+}
+
+input:focus,
+textarea:focus,
+select:focus {
+  border-color: var(--wgb-brand);
+  box-shadow: 0 0 0 2px var(--wgb-brand-tint);
+}
+
+/* ---------- Tabs: clearer separation + brand active state ---------- */
+.tabs-field__tabs {
+  border-bottom: 1px solid var(--theme-elevation-150);
+}
+
+.tabs-field__tab-button--active {
+  color: var(--wgb-brand-dark);
+}
+
+/* ---------- Nested groups (e.g. "Plano de fundo"): visible card boundary
+   — previously had no border/background, so it blended flat into the page ---------- */
+.group-field {
+  border: 1px solid var(--theme-elevation-150);
+  border-radius: 8px;
+  background: var(--theme-elevation-50);
+  padding: 16px 20px;
+  margin: 10px 0;
+}
+
+/* ---------- Collapsible rows (array items like "Slide 01"): tinted header ---------- */
+.collapsible__toggle {
+  background: var(--theme-elevation-50);
 }
