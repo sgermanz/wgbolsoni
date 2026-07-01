@@ -1,5 +1,7 @@
 import Image from "next/image";
 
+import { toEmbedUrl } from "@/lib/embed";
+
 type Media = {
   url?: string | null;
   alt?: string | null;
@@ -9,17 +11,6 @@ type Media = {
 
 const isMedia = (v: unknown): v is Media =>
   typeof v === "object" && v !== null && "url" in v;
-
-/** Extract a YouTube / Vimeo embed URL from any user-pasted link. */
-function toEmbedUrl(url: string): string | null {
-  const yt = url.match(
-    /(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|embed\/|v\/|shorts\/))([\w-]{11})/,
-  );
-  if (yt) return `https://www.youtube.com/embed/${yt[1]}`;
-  const vm = url.match(/vimeo\.com\/(?:video\/)?(\d+)/);
-  if (vm) return `https://player.vimeo.com/video/${vm[1]}`;
-  return null;
-}
 
 type ImageBlockFields = {
   image: Media | string | number;

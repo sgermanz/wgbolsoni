@@ -19,6 +19,7 @@ export async function seed(payload: Payload): Promise<void> {
   await seedAreas(payload);
   await seedPages(payload);
   await seedSiteSettings(payload);
+  await seedHomeHero(payload);
 }
 
 /**
@@ -156,4 +157,35 @@ async function seedSiteSettings(payload: Payload) {
   });
 
   payload.logger.info(`[seed] siteSettings: done`);
+}
+
+async function seedHomeHero(payload: Payload) {
+  const existing = (await payload.findGlobal({ slug: "homeHero" })) as {
+    slides?: unknown[];
+  } | null;
+  if (existing?.slides && existing.slides.length > 0) {
+    return;
+  }
+
+  await payload.updateGlobal({
+    slug: "homeHero",
+    data: {
+      autoplaySeconds: 6,
+      slides: [
+        {
+          eyebrow: `Holding de participações desde ${SITE.copyrightStart}`,
+          title: "Nossa marca está presente em cada um destes negócios.",
+          subtitle:
+            "Agronegócio, energia, meio ambiente, indústria e novas frentes — com a CPR Verde no centro da agenda ambiental e a proteína de alto valor biológico como nova fronteira nutricional global.",
+          primaryCtaLabel: "Fale com a WG Bolsoni",
+          primaryCtaHref: "/contato",
+          secondaryCtaLabel: "Conhecer as frentes",
+          secondaryCtaHref: "#areas",
+          background: { type: "none" },
+        },
+      ],
+    } as never,
+  });
+
+  payload.logger.info(`[seed] homeHero: done`);
 }

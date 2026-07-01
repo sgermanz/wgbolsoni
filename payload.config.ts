@@ -15,6 +15,7 @@ import { Posts } from "./cms/collections/Posts";
 import { Books } from "./cms/collections/Books";
 import { ContactMessages } from "./cms/collections/ContactMessages";
 import { SiteSettings } from "./cms/globals/SiteSettings";
+import { HomeHero } from "./cms/globals/HomeHero";
 import { seed } from "./cms/seed";
 
 const filename = fileURLToPath(import.meta.url);
@@ -76,7 +77,7 @@ export default buildConfig({
     Books,
     ContactMessages,
   ],
-  globals: [SiteSettings],
+  globals: [SiteSettings, HomeHero],
   onInit: async (payload) => {
     if (process.env.PAYLOAD_DISABLE_SEED === "true") return;
     try {

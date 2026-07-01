@@ -3,10 +3,11 @@ import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 
 import { getAllAreas } from "@/lib/content";
+import { getHomeHero } from "@/lib/home";
 import { Reveal } from "@/components/reveal";
 import { SectionHeading } from "@/components/section-heading";
 import { CTA } from "@/components/cta";
-import { SITE } from "@/lib/site";
+import { HomeHero } from "@/components/home-hero";
 
 // Without this the page is fully static-generated at build time. Railway's
 // build container can't reach the internal Postgres network, so the page
@@ -15,55 +16,12 @@ import { SITE } from "@/lib/site";
 export const revalidate = 60;
 
 export default async function HomePage() {
-  const areas = await getAllAreas();
+  const [areas, hero] = await Promise.all([getAllAreas(), getHomeHero()]);
 
   return (
     <>
-      {/* ===================== HERO ===================== */}
-      <section className="relative isolate overflow-hidden">
-        <div
-          aria-hidden
-          className="gradient-mesh absolute inset-0 -z-10 opacity-60 dark:opacity-40"
-        />
-        <div
-          aria-hidden
-          className="absolute inset-0 -z-10 bg-[radial-gradient(120%_120%_at_50%_-20%,transparent_40%,var(--surface)_100%)]"
-        />
-
-        <div className="mx-auto max-w-7xl px-5 pb-24 pt-36 lg:px-8 lg:pb-32 lg:pt-48">
-          <Reveal>
-            <p className="mb-6 inline-flex items-center gap-2 rounded-full border border-[var(--border)] bg-[var(--surface-2)]/60 px-4 py-1.5 text-sm font-medium text-[var(--content-soft)] backdrop-blur">
-              <span className="h-2 w-2 rounded-full bg-brand-500" />
-              Holding de participações desde {SITE.copyrightStart}
-            </p>
-          </Reveal>
-
-          <Reveal delay={0.05}>
-            <h1 className="text-balance max-w-4xl text-[length:var(--text-fluid-hero)] font-extrabold tracking-tight">
-              Nossa marca está presente em cada um destes negócios.
-            </h1>
-          </Reveal>
-
-          <Reveal delay={0.12}>
-            <p className="text-pretty mt-7 max-w-2xl text-[length:var(--text-fluid-lg)] text-[var(--content-soft)]">
-              Agronegócio, energia, meio ambiente, indústria e novas frentes —
-              com a <strong className="text-[var(--content)]">CPR Verde</strong>{" "}
-              no centro da agenda ambiental e a{" "}
-              <strong className="text-[var(--content)]">proteína de alto valor biológico</strong>{" "}
-              como nova fronteira nutricional global.
-            </p>
-          </Reveal>
-
-          <Reveal delay={0.18}>
-            <div className="mt-9 flex flex-wrap items-center gap-3">
-              <CTA href="/contato">Fale com a WG Bolsoni</CTA>
-              <CTA href="#areas" variant="ghost">
-                Conhecer as frentes
-              </CTA>
-            </div>
-          </Reveal>
-        </div>
-      </section>
+      {/* ===================== HERO (carrossel editável) ===================== */}
+      <HomeHero data={hero} />
 
       {/* ===================== ÁREAS DE ATUAÇÃO ===================== */}
       <section
