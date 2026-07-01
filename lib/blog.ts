@@ -65,7 +65,7 @@ type PayloadPostDoc = {
   title: string;
   excerpt: string;
   categories?: PostCategory[] | null;
-  tags?: { value: string }[] | null;
+  tags?: string[] | { value: string }[] | null;
   publishedAt?: string | null;
   readingTime?: number | null;
   body?: SerializedEditorState | null;
@@ -118,7 +118,10 @@ const toPost = (doc: PayloadPostDoc): PostRecord => {
     title: doc.title,
     excerpt: doc.excerpt,
     categories: doc.categories ?? undefined,
-    tags: doc.tags?.map((t) => t.value).filter(Boolean) ?? undefined,
+    tags:
+      (doc.tags
+        ?.map((t) => (typeof t === "string" ? t : t?.value))
+        .filter(Boolean) as string[] | undefined) ?? undefined,
     publishedAt: doc.publishedAt ?? undefined,
     readingTime: doc.readingTime ?? undefined,
     body: doc.body ?? undefined,
@@ -156,7 +159,7 @@ export async function listPosts({
         _status: { equals: "published" },
       };
       if (category) where.categories = { contains: category };
-      if (tag) where["tags.value"] = { equals: tag };
+      if (tag) where.tags = { contains: tag };
 
       const result = await payload.find({
         collection: "posts",

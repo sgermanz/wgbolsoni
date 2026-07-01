@@ -1,8 +1,11 @@
 import type { CollectionConfig } from "payload";
 import {
+  AlignFeature,
   BlocksFeature,
+  FixedToolbarFeature,
   HeadingFeature,
   HorizontalRuleFeature,
+  IndentFeature,
   lexicalEditor,
   LinkFeature,
 } from "@payloadcms/richtext-lexical";
@@ -69,6 +72,10 @@ export const Posts: CollectionConfig = {
       editor: lexicalEditor({
         features: ({ defaultFeatures }) => [
           ...defaultFeatures,
+          // Barra de ferramentas fixa no topo (negrito, itálico, listas…)
+          FixedToolbarFeature(),
+          AlignFeature(),
+          IndentFeature(),
           HeadingFeature({ enabledHeadingSizes: ["h2", "h3", "h4"] }),
           LinkFeature({ enabledCollections: ["pages", "posts", "areas"] }),
           HorizontalRuleFeature(),
@@ -101,10 +108,13 @@ export const Posts: CollectionConfig = {
     },
     {
       name: "tags",
-      type: "array",
+      type: "text",
+      hasMany: true,
       label: "Tags",
-      labels: { singular: "Tag", plural: "Tags" },
-      fields: [{ name: "value", type: "text", required: true }],
+      admin: {
+        description:
+          "Digite uma tag e tecle Enter para adicionar. Repita para várias.",
+      },
     },
     {
       name: "readingTime",

@@ -2,7 +2,12 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 
 import { postgresAdapter } from "@payloadcms/db-postgres";
-import { lexicalEditor } from "@payloadcms/richtext-lexical";
+import {
+  AlignFeature,
+  FixedToolbarFeature,
+  IndentFeature,
+  lexicalEditor,
+} from "@payloadcms/richtext-lexical";
 import { nodemailerAdapter } from "@payloadcms/email-nodemailer";
 import { buildConfig } from "payload";
 import sharp from "sharp";
@@ -45,7 +50,14 @@ export default buildConfig({
       },
     },
   },
-  editor: lexicalEditor(),
+  editor: lexicalEditor({
+    features: ({ defaultFeatures }) => [
+      ...defaultFeatures,
+      FixedToolbarFeature(),
+      AlignFeature(),
+      IndentFeature(),
+    ],
+  }),
   db: postgresAdapter({
     pool: { connectionString: databaseURI },
     // Schema is defined in `cms/collections/*` and synced automatically.
