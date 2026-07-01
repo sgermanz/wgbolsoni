@@ -1,6 +1,7 @@
 import type { CollectionConfig } from "payload";
 
 import { seoGroup } from "../fields/seo";
+import { slugField } from "../fields/slug";
 
 export const Areas: CollectionConfig = {
   slug: "areas",
@@ -19,17 +20,9 @@ export const Areas: CollectionConfig = {
   },
   fields: [
     { name: "title", type: "text", required: true, label: "Título" },
-    {
-      name: "slug",
-      type: "text",
-      required: true,
-      unique: true,
-      index: true,
-      admin: {
-        description: "URL: /areas/<slug>. Use kebab-case (ex: meio-ambiente).",
-        position: "sidebar",
-      },
-    },
+    slugField({
+      description: "URL: /areas/<slug>. Gerado do título ao salvar (ex: meio-ambiente).",
+    }),
     {
       name: "tag",
       type: "text",

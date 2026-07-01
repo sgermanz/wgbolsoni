@@ -9,6 +9,7 @@ import {
 
 import { seoGroup } from "../fields/seo";
 import { geoGroup } from "../fields/geo";
+import { slugField } from "../fields/slug";
 import { ImageBlock } from "../blocks/ImageBlock";
 import { GalleryBlock } from "../blocks/GalleryBlock";
 import { VideoBlock } from "../blocks/VideoBlock";
@@ -38,18 +39,8 @@ export const Posts: CollectionConfig = {
     },
   },
   fields: [
-    { name: "title", type: "text", required: true },
-    {
-      name: "slug",
-      type: "text",
-      required: true,
-      unique: true,
-      index: true,
-      admin: {
-        description: "URL: /blog/<slug>. Use kebab-case.",
-        position: "sidebar",
-      },
-    },
+    { name: "title", type: "text", required: true, label: "Título" },
+    slugField({ description: "URL: /blog/<slug>. Gerado do título ao salvar." }),
     {
       name: "excerpt",
       type: "textarea",
@@ -67,15 +58,38 @@ export const Posts: CollectionConfig = {
       label: "Imagem de capa",
     },
     {
+      name: "body",
+      type: "richText",
+      required: true,
+      label: "Conteúdo da matéria",
+      admin: {
+        description:
+          "Escreva aqui. Use o botão + para inserir imagem, galeria ou vídeo (YouTube/Vimeo ou upload) no meio do texto.",
+      },
+      editor: lexicalEditor({
+        features: ({ defaultFeatures }) => [
+          ...defaultFeatures,
+          HeadingFeature({ enabledHeadingSizes: ["h2", "h3", "h4"] }),
+          LinkFeature({ enabledCollections: ["pages", "posts", "areas"] }),
+          HorizontalRuleFeature(),
+          BlocksFeature({
+            blocks: [ImageBlock, GalleryBlock, VideoBlock],
+          }),
+        ],
+      }),
+    },
+    {
       name: "author",
       type: "relationship",
       relationTo: "users",
       required: true,
+      label: "Autor",
     },
     {
       name: "categories",
       type: "select",
       hasMany: true,
+      label: "Categorias",
       options: [
         { label: "Agronegócio", value: "agro" },
         { label: "Energia", value: "energia" },
@@ -91,22 +105,6 @@ export const Posts: CollectionConfig = {
       label: "Tags",
       labels: { singular: "Tag", plural: "Tags" },
       fields: [{ name: "value", type: "text", required: true }],
-    },
-    {
-      name: "body",
-      type: "richText",
-      required: true,
-      editor: lexicalEditor({
-        features: ({ defaultFeatures }) => [
-          ...defaultFeatures,
-          HeadingFeature({ enabledHeadingSizes: ["h2", "h3", "h4"] }),
-          LinkFeature({ enabledCollections: ["pages", "posts", "areas"] }),
-          HorizontalRuleFeature(),
-          BlocksFeature({
-            blocks: [ImageBlock, GalleryBlock, VideoBlock],
-          }),
-        ],
-      }),
     },
     {
       name: "readingTime",

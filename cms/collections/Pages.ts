@@ -1,6 +1,7 @@
 import type { CollectionConfig } from "payload";
 
 import { seoGroup } from "../fields/seo";
+import { slugField } from "../fields/slug";
 
 /**
  * Generic institutional pages — Conceito, Políticas, and any future
@@ -21,18 +22,8 @@ export const Pages: CollectionConfig = {
     read: () => true,
   },
   fields: [
-    { name: "title", type: "text", required: true },
-    {
-      name: "slug",
-      type: "text",
-      required: true,
-      unique: true,
-      index: true,
-      admin: {
-        description: "URL: /<slug>. Use kebab-case.",
-        position: "sidebar",
-      },
-    },
+    { name: "title", type: "text", required: true, label: "Título" },
+    slugField({ description: "URL: /<slug>. Gerado do título ao salvar." }),
     {
       name: "subtitle",
       type: "textarea",
