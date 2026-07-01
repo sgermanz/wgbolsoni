@@ -8,7 +8,8 @@
   --wgb-brand: #2f8049;
   --wgb-brand-dark: #21602f;
   --wgb-brand-tint: #dfeee5;
-  --wgb-zone-bg: #f2f4f2; /* sidebar / header zones — a touch darker than the pure-white content area, for depth and wayfinding */
+  --wgb-zone-bg: #dde3de; /* sidebar / header zones — clearly darker than the white content area */
+  --wgb-zone-border: #c1c9c2; /* dividers on top of the zone bg — theme-elevation-150 is too close to zone-bg to read as a line */
 
   --theme-elevation-50: #f7faf8;
   --theme-success-500: #2f8049; /* brand green */
@@ -35,6 +36,7 @@
 /* ---------- Sidebar navigation ---------- */
 .nav {
   background: var(--wgb-zone-bg);
+  border-right: 1px solid var(--wgb-zone-border);
 }
 
 .nav-group__label,
@@ -96,7 +98,7 @@ select:focus {
 /* ---------- Doc header (title + tabs bar): its own zone, not flat white ---------- */
 .doc-header {
   background: var(--wgb-zone-bg);
-  border-bottom: 1px solid var(--theme-elevation-150);
+  border-bottom: 1px solid var(--wgb-zone-border);
 }
 
 /* ---------- Tabs: clearer separation + brand active state ---------- */
