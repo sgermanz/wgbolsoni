@@ -48,6 +48,7 @@ export default buildConfig({
           path: "/analytics",
         },
       },
+      afterNavLinks: ["@/cms/components/NavActiveHighlight#default"],
     },
   },
   editor: lexicalEditor({

@@ -7,7 +7,8 @@
 :root {
   --wgb-brand: #2f8049;
   --wgb-brand-dark: #21602f;
-  --wgb-brand-tint: #eaf3ee;
+  --wgb-brand-tint: #dfeee5;
+  --wgb-zone-bg: #f2f4f2; /* sidebar / header zones — a touch darker than the pure-white content area, for depth and wayfinding */
 
   --theme-elevation-50: #f7faf8;
   --theme-success-500: #2f8049; /* brand green */
@@ -32,6 +33,10 @@
 }
 
 /* ---------- Sidebar navigation ---------- */
+.nav {
+  background: var(--wgb-zone-bg);
+}
+
 .nav-group__label,
 .nav-group__toggle {
   color: var(--theme-elevation-600);
@@ -57,9 +62,17 @@
   background: var(--wgb-brand-tint);
 }
 
-.nav__link--active {
+/* "Where am I" — Payload's default Nav has no active-page indicator at
+   all (no class, no aria-current). NavActiveHighlight.tsx (injected via
+   admin.components.afterNavLinks) sets this attribute on route change. */
+.nav__link[data-active="true"] {
   background: var(--wgb-brand-tint);
+  color: var(--wgb-brand-dark);
   font-weight: 600;
+}
+
+.nav__link[data-active="true"] .nav__link-label {
+  color: var(--wgb-brand-dark);
 }
 
 /* ---------- Inputs: firmer border + on-brand focus ring ---------- */
@@ -78,6 +91,12 @@ textarea:focus,
 select:focus {
   border-color: var(--wgb-brand);
   box-shadow: 0 0 0 2px var(--wgb-brand-tint);
+}
+
+/* ---------- Doc header (title + tabs bar): its own zone, not flat white ---------- */
+.doc-header {
+  background: var(--wgb-zone-bg);
+  border-bottom: 1px solid var(--theme-elevation-150);
 }
 
 /* ---------- Tabs: clearer separation + brand active state ---------- */
