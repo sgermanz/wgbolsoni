@@ -38,6 +38,7 @@ export type PageRecord = {
   subtitle?: string;
   bodyLexical?: SerializedEditorState;
   bodyParagraphs?: string[];
+  cover?: AreaCover;
 };
 
 export type SiteSettingsRecord = {
@@ -175,14 +176,34 @@ export async function getPageBySlug(
             title: string;
             subtitle?: string | null;
             body?: SerializedEditorState | null;
+            coverImage?:
+              | {
+                  url?: string | null;
+                  alt?: string | null;
+                  width?: number | null;
+                  height?: number | null;
+                }
+              | string
+              | number
+              | null;
           }
         | undefined;
       if (!doc) throw new Error("page not found");
+      const cover =
+        typeof doc.coverImage === "object" && doc.coverImage?.url
+          ? {
+              url: doc.coverImage.url,
+              alt: doc.coverImage.alt || doc.title,
+              width: doc.coverImage.width ?? undefined,
+              height: doc.coverImage.height ?? undefined,
+            }
+          : undefined;
       return {
         slug: doc.slug,
         title: doc.title,
         subtitle: doc.subtitle ?? undefined,
         bodyLexical: doc.body ?? undefined,
+        cover,
       };
     },
     undefined,

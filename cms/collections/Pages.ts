@@ -40,6 +40,10 @@ export const Pages: CollectionConfig = {
       type: "upload",
       relationTo: "media",
       label: "Imagem de capa",
+      admin: {
+        description:
+          "Foto exibida ao lado do texto (formato retrato, proporção 9:16). Deixe em branco para o texto ocupar a largura toda.",
+      },
     },
     seoGroup,
   ],
