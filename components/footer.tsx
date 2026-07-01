@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { SITE, NAV_TOP } from "@/lib/site";
 import { AREAS } from "@/lib/areas";
+import { Brand } from "@/components/brand";
 
 export function Footer() {
   return (
@@ -10,8 +11,7 @@ export function Footer() {
           {/* Marca */}
           <div>
             <Link href="/" aria-label={SITE.name} className="inline-flex items-center">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src="/logo.svg" alt={SITE.name} className="h-9 w-auto" />
+              <Brand size="lg" />
             </Link>
             <p className="text-pretty mt-4 max-w-xs text-sm text-[var(--content-soft)]">
               {SITE.tagline}

@@ -9,6 +9,7 @@ import { ChevronDown, Menu, X, Sun, Moon } from "lucide-react";
 import { NAV_TOP, SITE } from "@/lib/site";
 import { AREAS } from "@/lib/areas";
 import { cn } from "@/lib/utils";
+import { Brand } from "@/components/brand";
 
 export function Navbar() {
   const [scrolled, setScrolled] = useState(false);
@@ -69,15 +70,7 @@ export function Navbar() {
     >
       <nav className="mx-auto flex h-16 max-w-7xl items-center justify-between gap-6 px-5 lg:h-20 lg:px-8" aria-label="Principal">
         <Link href="/" aria-label={SITE.name} className="flex items-center">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src="/logo.svg"
-            alt={SITE.name}
-            className={cn(
-              "h-8 w-auto lg:h-9",
-              lightText && "drop-shadow-[0_1px_10px_rgba(255,255,255,0.35)]",
-            )}
-          />
+          <Brand onDark={lightText} />
         </Link>
 
         {/* Navegação desktop */}
