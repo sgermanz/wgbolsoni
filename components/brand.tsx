@@ -1,6 +1,8 @@
 import { cn } from "@/lib/utils";
 
 type Props = {
+  /** Brand name, editable via the Site Settings global — falls back to lib/site.ts. */
+  name: string;
   /** "md" for the navbar, "lg" (~30% larger) for the footer. */
   size?: "md" | "lg";
   /** When over a dark hero, render the wordmark in white. */
@@ -14,7 +16,7 @@ type Props = {
  * logo so the wordmark adapts to light/dark backgrounds (the exported logo
  * baked in fixed colors that vanished on dark or light surfaces).
  */
-export function Brand({ size = "md", onDark = false, className }: Props) {
+export function Brand({ name, size = "md", onDark = false, className }: Props) {
   const isLg = size === "lg";
   return (
     <span className={cn("inline-flex items-center gap-3", className)}>
@@ -33,7 +35,7 @@ export function Brand({ size = "md", onDark = false, className }: Props) {
             onDark ? "text-white" : "text-[var(--content)]",
           )}
         >
-          WG Bolsoni
+          {name}
         </span>
         <span
           className={cn(

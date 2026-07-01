@@ -1,5 +1,6 @@
 import "server-only";
 
+import { cache } from "react";
 import type { SerializedEditorState } from "@payloadcms/richtext-lexical/lexical";
 
 import { AREAS, type Area as LegacyArea } from "@/lib/areas";
@@ -189,7 +190,9 @@ export async function getPageBySlug(
   );
 }
 
-export async function getSiteSettings(): Promise<SiteSettingsRecord> {
+// Memoized per-request: layout.tsx (metadata + JSON-LD) and Navbar/Footer
+// each need this, and without cache() we'd hit Payload twice per request.
+export const getSiteSettings = cache(async (): Promise<SiteSettingsRecord> => {
   const legacy: SiteSettingsRecord = {
     name: SITE.name,
     legalName: SITE.legalName,
@@ -224,4 +227,4 @@ export async function getSiteSettings(): Promise<SiteSettingsRecord> {
     legacy,
     "getSiteSettings",
   );
-}
+});

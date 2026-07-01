@@ -6,12 +6,12 @@ import { useEffect, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { ChevronDown, Menu, X, Sun, Moon } from "lucide-react";
 
-import { NAV_TOP, SITE } from "@/lib/site";
+import { NAV_TOP } from "@/lib/site";
 import { AREAS } from "@/lib/areas";
 import { cn } from "@/lib/utils";
 import { Brand } from "@/components/brand";
 
-export function Navbar() {
+export function Navbar({ brandName }: { brandName: string }) {
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);              // mobile menu
   const [areasOpen, setAreasOpen] = useState(false);    // desktop dropdown
@@ -69,8 +69,8 @@ export function Navbar() {
       )}
     >
       <nav className="mx-auto flex h-16 max-w-7xl items-center justify-between gap-6 px-5 lg:h-20 lg:px-8" aria-label="Principal">
-        <Link href="/" aria-label={SITE.name} className="flex items-center">
-          <Brand onDark={lightText} />
+        <Link href="/" aria-label={brandName} className="flex items-center">
+          <Brand name={brandName} onDark={lightText} />
         </Link>
 
         {/* Navegação desktop */}

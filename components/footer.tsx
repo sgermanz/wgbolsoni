@@ -3,18 +3,25 @@ import { SITE, NAV_TOP } from "@/lib/site";
 import { AREAS } from "@/lib/areas";
 import { Brand } from "@/components/brand";
 
-export function Footer() {
+type Props = {
+  brandName: string;
+  tagline: string;
+  email: string;
+  copyrightStart: number;
+};
+
+export function Footer({ brandName, tagline, email, copyrightStart }: Props) {
   return (
     <footer className="border-t border-[var(--border)] bg-[var(--surface-2)]">
       <div className="mx-auto max-w-7xl px-5 py-16 lg:px-8">
         <div className="grid gap-12 md:grid-cols-2 lg:grid-cols-4">
           {/* Marca */}
           <div>
-            <Link href="/" aria-label={SITE.name} className="inline-flex items-center">
-              <Brand size="lg" />
+            <Link href="/" aria-label={brandName} className="inline-flex items-center">
+              <Brand name={brandName} size="lg" />
             </Link>
             <p className="text-pretty mt-4 max-w-xs text-sm text-[var(--content-soft)]">
-              {SITE.tagline}
+              {tagline}
             </p>
           </div>
 
@@ -61,17 +68,17 @@ export function Footer() {
 
             <h3 className="mt-8 font-display font-semibold">Contato</h3>
             <a
-              href={`mailto:${SITE.email}`}
+              href={`mailto:${email}`}
               className="mt-3 inline-block text-[var(--content-soft)] transition hover:text-[var(--content)]"
             >
-              {SITE.email}
+              {email}
             </a>
           </div>
         </div>
 
         <div className="mt-14 flex flex-col items-start justify-between gap-4 border-t border-[var(--border)] pt-7 text-sm text-[var(--content-soft)] sm:flex-row sm:items-center">
           <p>
-            &copy; {SITE.copyrightStart} &ndash; {SITE.copyrightEnd} {SITE.name}.
+            &copy; {copyrightStart} &ndash; {SITE.copyrightEnd} {brandName}.
             Todos os direitos reservados.
           </p>
           <Link href="/politicas" className="transition hover:text-[var(--content)]">

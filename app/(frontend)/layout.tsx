@@ -14,6 +14,13 @@ import {
   buildLocalBusinessSchema,
 } from "@/lib/schema";
 
+// Root layout now reads Site Settings from the CMS (brand name, tagline,
+// email). Without a revalidate window every route would inherit whatever
+// was fetched at build time (when Postgres isn't reachable), freezing the
+// navbar/footer/title on the fallback forever — same class of bug we hit
+// with area cover images.
+export const revalidate = 60;
+
 // Display: Sora (geométrica corporate). Body: Inter (highly readable sans).
 const sora = Sora({
   subsets: ["latin"],
@@ -29,24 +36,27 @@ const inter = Inter({
   display: "swap",
 });
 
-export const metadata: Metadata = {
-  metadataBase: new URL(SITE.url),
-  title: {
-    default: `${SITE.name} — ${SITE.tagline}`,
-    template: `%s · ${SITE.name}`,
-  },
-  description: SITE.description,
-  openGraph: {
-    type: "website",
-    locale: "pt_BR",
-    siteName: SITE.name,
-    url: SITE.url,
-    title: SITE.name,
-    description: SITE.description,
-  },
-  robots: { index: true, follow: true, "max-image-preview": "large" },
-  alternates: { canonical: SITE.url },
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const settings = await getSiteSettings();
+  return {
+    metadataBase: new URL(SITE.url),
+    title: {
+      default: `${settings.name} — ${settings.tagline}`,
+      template: `%s · ${settings.name}`,
+    },
+    description: settings.description,
+    openGraph: {
+      type: "website",
+      locale: "pt_BR",
+      siteName: settings.name,
+      url: SITE.url,
+      title: settings.name,
+      description: settings.description,
+    },
+    robots: { index: true, follow: true, "max-image-preview": "large" },
+    alternates: { canonical: SITE.url },
+  };
+}
 
 // Script inline anti-FOUC: aplica a classe `.dark` antes do React montar,
 // usando a preferência salva ou a do sistema.
@@ -88,11 +98,16 @@ export default async function RootLayout({
         >
           Pular para o conteúdo
         </a>
-        <Navbar />
+        <Navbar brandName={settings.name} />
         <main id="main" className="flex-1">
           {children}
         </main>
-        <Footer />
+        <Footer
+          brandName={settings.name}
+          tagline={settings.tagline}
+          email={settings.email}
+          copyrightStart={settings.copyrightStart}
+        />
       </body>
     </html>
   );
