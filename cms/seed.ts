@@ -1,3 +1,5 @@
+import { createRequire } from "node:module";
+
 import type { Payload } from "payload";
 import { pushDevSchema } from "@payloadcms/drizzle";
 
@@ -39,6 +41,18 @@ async function ensureSchema(payload: Payload): Promise<void> {
     // (see node_modules/@payloadcms/db-postgres/dist/connect.js). On Railway,
     // NODE_ENV is 'production', so we call the same utility ourselves.
     // Safe to re-run: it diffs the schema and applies only what's missing.
+    //
+    // When a change is potentially destructive (e.g. dropping a column while
+    // altering a field type), pushDevSchema calls prompts() to ask for
+    // confirmation. Railway containers have no TTY, so that throws. Since our
+    // schema is code-owned and applied intentionally, we pre-inject "yes"
+    // answers so the push proceeds non-interactively. (Postgres backups on
+    // Railway are the safety net — see README.)
+    const require = createRequire(import.meta.url);
+    const prompts = require("prompts") as {
+      inject: (values: unknown[]) => void;
+    };
+    prompts.inject(Array(20).fill(true));
     await pushDevSchema(payload.db as never);
     payload.logger.info("[schema] sync done");
   } catch (error) {
