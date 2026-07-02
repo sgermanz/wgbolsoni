@@ -13,11 +13,11 @@ import {
  * (meta title/description/keyword), GEO (FAQ → FAQPage JSON-LD) e capas
  * genéricas geradas em tons da marca (o editor troca depois no admin).
  *
- * Idempotente: só roda quando a coleção `posts` está totalmente vazia
- * (rascunhos incluídos), então nunca duplica nem ressuscita matérias
- * apagadas individualmente. Autor: primeiro usuário cujo nome contém
- * "Wilton" (fallback: primeiro usuário) — em produção, o usuário
- * "Wilton G Bolsoni" já existe.
+ * Idempotente: pula se QUALQUER um dos slugs do seed já existir (rascunhos
+ * incluídos) — assim não duplica, não ressuscita matérias apagadas uma a
+ * uma, e convive com rascunhos criados manualmente no admin antes do seed
+ * rodar. Autor: primeiro usuário cujo nome contém "Wilton" (fallback:
+ * primeiro usuário) — em produção, o usuário "Wilton G Bolsoni" já existe.
  */
 
 type SeedPost = {
@@ -734,13 +734,16 @@ async function makeCover(
 }
 
 export async function seedBlogPosts(payload: Payload): Promise<void> {
+  // Guard on OUR slugs, not on the whole collection: manually-created test
+  // drafts in the admin must not block the seed (bit us in production).
   const existing = await payload.find({
     collection: "posts",
+    where: { slug: { in: POSTS.map((p) => p.slug) } },
     limit: 1,
     pagination: false,
   });
   if (existing.docs.length > 0) {
-    payload.logger.info("[seed] posts: 1+ already present — skipping");
+    payload.logger.info("[seed] posts: seed slugs already present — skipping");
     return;
   }
 
