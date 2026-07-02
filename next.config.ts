@@ -23,6 +23,9 @@ if (serverUrl) {
     remotePatterns.push({
       protocol: u.protocol.replace(":", "") as "http" | "https",
       hostname: u.hostname,
+      // Sem a porta explícita o Next só casa 80/443 — em dev a URL é
+      // localhost:3000 e o otimizador devolvia 400 para a própria mídia.
+      ...(u.port ? { port: u.port } : {}),
     });
   } catch {
     // ignore malformed env value
@@ -30,7 +33,13 @@ if (serverUrl) {
 }
 
 const nextConfig: NextConfig = {
-  images: { remotePatterns },
+  images: {
+    remotePatterns,
+    // Next 16 blocks optimizing images whose host resolves to a private IP
+    // (SSRF guard). In dev, Payload media URLs are http://localhost:3000/...,
+    // so every cover 400s without this. Never enabled in production.
+    dangerouslyAllowLocalIP: process.env.NODE_ENV !== "production",
+  },
 };
 
 export default withPayload(nextConfig, { devBundleServerPackages: false });

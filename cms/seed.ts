@@ -13,6 +13,7 @@ import {
   lexBulletList,
   lexicalToPlainParagraphs,
 } from "@/lib/lexical";
+import { seedBlogPosts } from "./seed-posts";
 
 /**
  * The full Conceito body, mirroring the rich content the /conceito page used
@@ -78,6 +79,7 @@ export async function seed(payload: Payload): Promise<void> {
   await backfillConceitoBody(payload);
   await seedSiteSettings(payload);
   await seedHomeHero(payload);
+  await seedBlogPosts(payload);
 }
 
 /**
