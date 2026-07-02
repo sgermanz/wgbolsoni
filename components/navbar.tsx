@@ -10,6 +10,7 @@ import { NAV_TOP } from "@/lib/site";
 import { AREAS } from "@/lib/areas";
 import { cn } from "@/lib/utils";
 import { Brand } from "@/components/brand";
+import { useHeroOnDark } from "@/components/hero-theme";
 
 export function Navbar({ brandName }: { brandName: string }) {
   const [scrolled, setScrolled] = useState(false);
@@ -17,10 +18,15 @@ export function Navbar({ brandName }: { brandName: string }) {
   const [areasOpen, setAreasOpen] = useState(false);    // desktop dropdown
   const [dark, setDark] = useState(false);
   const pathname = usePathname();
+  const heroOnDark = useHeroOnDark();
 
   // Páginas de área têm hero com imagem escura de fundo: no topo (antes de
-  // rolar) os links precisam ser claros para não sumirem sobre a foto.
-  const onDarkHero = pathname?.startsWith("/areas/") ?? false;
+  // rolar) os links precisam ser claros para não sumirem sobre a foto. Na
+  // home, o hero é um carrossel cujo fundo (claro/escuro) muda por slide —
+  // heroOnDark vem do próprio HomeHero via contexto (ver hero-theme.tsx).
+  const isHome = pathname === "/";
+  const onDarkHero =
+    (pathname?.startsWith("/areas/") ?? false) || (isHome && heroOnDark);
   const lightText = onDarkHero && !scrolled && !open;
 
   // Reage ao scroll: navbar transparente no topo, sólida ao descer.
