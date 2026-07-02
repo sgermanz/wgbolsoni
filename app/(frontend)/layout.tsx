@@ -6,7 +6,6 @@ import "./globals.css";
 import { Navbar } from "@/components/navbar";
 import { Footer } from "@/components/footer";
 import { JsonLd } from "@/components/json-ld";
-import { HeroThemeProvider } from "@/components/hero-theme";
 import { SITE } from "@/lib/site";
 import { getSiteSettings } from "@/lib/content";
 import {
@@ -99,12 +98,10 @@ export default async function RootLayout({
         >
           Pular para o conteúdo
         </a>
-        <HeroThemeProvider>
-          <Navbar brandName={settings.name} />
-          <main id="main" className="flex-1">
-            {children}
-          </main>
-        </HeroThemeProvider>
+        <Navbar brandName={settings.name} />
+        <main id="main" className="flex-1">
+          {children}
+        </main>
         <Footer
           brandName={settings.name}
           tagline={settings.tagline}

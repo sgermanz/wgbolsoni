@@ -1,7 +1,6 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { ChevronDown, Menu, X, Sun, Moon } from "lucide-react";
@@ -10,32 +9,11 @@ import { NAV_TOP } from "@/lib/site";
 import { AREAS } from "@/lib/areas";
 import { cn } from "@/lib/utils";
 import { Brand } from "@/components/brand";
-import { useHeroOnDark } from "@/components/hero-theme";
 
 export function Navbar({ brandName }: { brandName: string }) {
-  const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);              // mobile menu
   const [areasOpen, setAreasOpen] = useState(false);    // desktop dropdown
   const [dark, setDark] = useState(false);
-  const pathname = usePathname();
-  const heroOnDark = useHeroOnDark();
-
-  // Páginas de área têm hero com imagem escura de fundo: no topo (antes de
-  // rolar) os links precisam ser claros para não sumirem sobre a foto. Na
-  // home, o hero é um carrossel cujo fundo (claro/escuro) muda por slide —
-  // heroOnDark vem do próprio HomeHero via contexto (ver hero-theme.tsx).
-  const isHome = pathname === "/";
-  const onDarkHero =
-    (pathname?.startsWith("/areas/") ?? false) || (isHome && heroOnDark);
-  const lightText = onDarkHero && !scrolled && !open;
-
-  // Reage ao scroll: navbar transparente no topo, sólida ao descer.
-  useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 24);
-    onScroll();
-    window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
-  }, []);
 
   // Lê o tema atual aplicado pelo bootstrap inline.
   useEffect(() => {
@@ -49,31 +27,14 @@ export function Navbar({ brandName }: { brandName: string }) {
     setDark(next);
   };
 
-  const navLink = cn(
-    "rounded-lg px-3 py-2 text-sm font-medium transition",
-    lightText
-      ? "text-white/85 hover:text-white"
-      : "text-[var(--content-soft)] hover:text-[var(--content)]",
-  );
+  const navLink =
+    "rounded-lg px-3 py-2 text-sm font-medium text-[var(--content-soft)] transition hover:text-[var(--content)]";
 
-  const iconBtn = cn(
-    "grid h-10 w-10 place-items-center rounded-lg transition",
-    lightText
-      ? "text-white/85 hover:bg-white/10 hover:text-white"
-      : "text-[var(--content-soft)] hover:bg-[var(--surface-2)] hover:text-[var(--content)]",
-  );
+  const iconBtn =
+    "grid h-10 w-10 place-items-center rounded-lg text-[var(--content-soft)] transition hover:bg-[var(--surface-2)] hover:text-[var(--content)]";
 
   return (
-    <header
-      className={cn(
-        "fixed inset-x-0 top-0 z-50 transition-colors duration-300",
-        scrolled || open
-          ? "bg-[color-mix(in_oklab,var(--surface)_85%,transparent)] backdrop-blur-xl"
-          : lightText
-            ? "bg-gradient-to-b from-black/45 to-transparent"
-            : "bg-transparent",
-      )}
-    >
+    <header className="fixed inset-x-0 top-0 z-50 border-b border-[var(--border)] bg-[var(--surface)]">
       <nav className="relative mx-auto flex h-16 max-w-7xl items-center gap-6 px-5 lg:h-20 lg:px-8" aria-label="Principal">
         {/* No mobile o logo fica centralizado (posição absoluta, ignora o
             espaço assimétrico dos ícones à direita); no desktop volta ao

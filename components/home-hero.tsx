@@ -13,7 +13,6 @@ import {
   HeroOverlayEffect,
   heroMediaFilterClass,
 } from "@/components/hero-overlay-effect";
-import { useReportHeroOnDark } from "@/components/hero-theme";
 
 function isExternal(href: string) {
   return /^https?:\/\//.test(href);
@@ -256,7 +255,6 @@ export function HomeHero({ data }: { data: HomeHeroData }) {
 
   const slide = slides[index];
   const onDark = slide.background.type !== "none";
-  useReportHeroOnDark(onDark);
 
   return (
     <section
