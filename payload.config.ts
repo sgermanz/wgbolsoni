@@ -49,6 +49,9 @@ export default buildConfig({
         },
       },
       afterNavLinks: ["@/cms/components/NavActiveHighlight#default"],
+      graphics: {
+        Logo: "@/cms/components/AdminLogo#default",
+      },
     },
   },
   editor: lexicalEditor({

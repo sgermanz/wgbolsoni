@@ -74,9 +74,16 @@ export function Navbar({ brandName }: { brandName: string }) {
             : "bg-transparent",
       )}
     >
-      <nav className="mx-auto flex h-16 max-w-7xl items-center justify-between gap-6 px-5 lg:h-20 lg:px-8" aria-label="Principal">
-        <Link href="/" aria-label={brandName} className="flex items-center">
-          <Brand name={brandName} onDark={lightText} />
+      <nav className="relative mx-auto flex h-16 max-w-7xl items-center gap-6 px-5 lg:h-20 lg:px-8" aria-label="Principal">
+        {/* No mobile o logo fica centralizado (posição absoluta, ignora o
+            espaço assimétrico dos ícones à direita); no desktop volta ao
+            fluxo normal, primeiro item à esquerda. */}
+        <Link
+          href="/"
+          aria-label={brandName}
+          className="absolute left-1/2 top-1/2 flex -translate-x-1/2 -translate-y-1/2 items-center lg:static lg:left-auto lg:top-auto lg:translate-x-0 lg:translate-y-0"
+        >
+          <Brand name={brandName} />
         </Link>
 
         {/* Navegação desktop */}
@@ -132,7 +139,7 @@ export function Navbar({ brandName }: { brandName: string }) {
           </div>
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="ml-auto flex items-center gap-2">
           <button
             type="button"
             onClick={toggleTheme}
