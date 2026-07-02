@@ -27,14 +27,18 @@ export function Navbar({ brandName }: { brandName: string }) {
     setDark(next);
   };
 
+  // A barra superior é FIXA no bege-claro da marca, mesmo quando o site
+  // inteiro entra em modo escuro — decisão explícita do cliente. Por isso
+  // as cores da navbar não usam as variáveis de tema (--surface, --content
+  // etc.), que trocariam com .dark; ficam com valores literais.
   const navLink =
-    "rounded-lg px-3 py-2 text-sm font-medium text-[var(--content-soft)] transition hover:text-[var(--content)]";
+    "rounded-lg px-3 py-2 text-sm font-medium text-ink-500 transition hover:text-ink-800";
 
   const iconBtn =
-    "grid h-10 w-10 place-items-center rounded-lg text-[var(--content-soft)] transition hover:bg-[var(--surface-2)] hover:text-[var(--content)]";
+    "grid h-10 w-10 place-items-center rounded-lg text-ink-500 transition hover:bg-white hover:text-ink-800";
 
   return (
-    <header className="fixed inset-x-0 top-0 z-50 border-b border-[var(--border)] bg-[var(--surface)]">
+    <header className="fixed inset-x-0 top-0 z-50 border-b border-ink-200 bg-ink-50">
       <nav className="relative mx-auto flex h-16 max-w-7xl items-center gap-6 px-5 lg:h-20 lg:px-8" aria-label="Principal">
         {/* No mobile o logo fica centralizado (posição absoluta, ignora o
             espaço assimétrico dos ícones à direita); no desktop volta ao
@@ -137,7 +141,7 @@ export function Navbar({ brandName }: { brandName: string }) {
             animate={{ height: "auto", opacity: 1 }}
             exit={{ height: 0, opacity: 0 }}
             transition={{ duration: 0.25 }}
-            className="overflow-hidden border-t border-[var(--border)] bg-[var(--surface)] lg:hidden"
+            className="overflow-hidden border-t border-ink-200 bg-ink-50 lg:hidden"
           >
             <div className="space-y-1 px-5 py-4">
               {NAV_TOP.map((item) => (
@@ -145,13 +149,13 @@ export function Navbar({ brandName }: { brandName: string }) {
                   key={item.href}
                   href={item.href}
                   onClick={() => setOpen(false)}
-                  className="block rounded-lg px-3 py-3 text-base font-medium transition hover:bg-[var(--surface-2)]"
+                  className="block rounded-lg px-3 py-3 text-base font-medium text-ink-800 transition hover:bg-white"
                 >
                   {item.label}
                 </Link>
               ))}
-              <div className="my-2 border-t border-[var(--border)]" />
-              <p className="px-3 py-1 text-xs font-semibold uppercase tracking-wider text-[var(--content-soft)]">
+              <div className="my-2 border-t border-ink-200" />
+              <p className="px-3 py-1 text-xs font-semibold uppercase tracking-wider text-ink-500">
                 Áreas de atuação
               </p>
               {AREAS.map((a) => (
@@ -159,7 +163,7 @@ export function Navbar({ brandName }: { brandName: string }) {
                   key={a.slug}
                   href={`/areas/${a.slug}`}
                   onClick={() => setOpen(false)}
-                  className="block rounded-lg px-3 py-2.5 text-sm transition hover:bg-[var(--surface-2)]"
+                  className="block rounded-lg px-3 py-2.5 text-sm text-ink-800 transition hover:bg-white"
                 >
                   {a.title}
                 </Link>
