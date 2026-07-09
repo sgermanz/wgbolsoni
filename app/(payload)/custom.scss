@@ -2,66 +2,135 @@
  * nothing here can affect the public site. Payload's own CSS lives inside
  * the `payload-default` @layer, so plain (unlayered) rules here win over it
  * automatically without needing !important — that's why this file works as
- * a thin set of overrides instead of a full rewrite. */
+ * a thin set of overrides instead of a full rewrite.
+ *
+ * Design goals (this rewrite):
+ *   - Lift the base font size — Payload defaults to 12px everywhere, which
+ *     was the client's main "too hard to read" complaint.
+ *   - Make cards actually pop by giving the content area a soft off-white
+ *     backdrop, then keeping the cards themselves pure white with a real
+ *     border + subtle shadow (SaaS admin look, à la Linear/Notion).
+ *   - Firmer inputs (white, real border, brand focus ring).
+ *   - Stronger typography hierarchy: labels bold, descriptions readable.
+ *   - Brand green anywhere Payload used its own blue/purple.
+ */
 
 :root {
   --wgb-brand: #2f8049;
   --wgb-brand-dark: #21602f;
   --wgb-brand-tint: #dfeee5;
-  --wgb-zone-bg: #dde3de; /* sidebar / header zones — clearly darker than the white content area */
-  --wgb-zone-border: #c1c9c2; /* dividers on top of the zone bg — theme-elevation-150 is too close to zone-bg to read as a line */
 
+  /* Sidebar / header zones — a warm gray-green so cards float above them. */
+  --wgb-zone-bg: #dde3de;
+  --wgb-zone-border: #c1c9c2;
+
+  /* Content backdrop: soft off-white — dark enough that pure-white cards
+     read as elevated, light enough that the eye still sees "page". */
+  --wgb-content-bg: #f2f4f2;
+
+  /* Card chrome. */
+  --wgb-card-bg: #ffffff;
+  --wgb-card-border: #e2e6e2;
+  --wgb-card-shadow: 0 1px 2px rgba(15, 30, 20, 0.04),
+    0 1px 3px rgba(15, 30, 20, 0.06);
+
+  /* Text ramp (Payload's default was too low-contrast). */
+  --wgb-ink-strong: #14211a;
+  --wgb-ink: #2a3730;
+  --wgb-ink-soft: #55635b;
+
+  /* Bump Payload's own tokens where possible so utility classes we don't
+     override still land on the new palette. */
+  --theme-elevation-0: var(--wgb-content-bg);
   --theme-elevation-50: #f7faf8;
-  --theme-success-500: #2f8049; /* brand green */
+  --theme-elevation-100: #eef1ee;
+  --theme-elevation-150: #e2e6e2;
+  --theme-elevation-800: var(--wgb-ink-strong);
+  --theme-success-500: var(--wgb-brand);
 }
 
-/* ---------- Primary buttons (Save / Create / Publish): brand color ---------- */
-.btn--style-primary:not(.btn--disabled) {
-  --bg-color: var(--wgb-brand);
-  --hover-bg: var(--wgb-brand-dark);
+/* ============================================================
+ * 1. Base typography — 14px everywhere, better line-height
+ * ============================================================ */
+html {
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--wgb-ink);
+  background: var(--wgb-content-bg);
 }
 
-/* ---------- Field labels: clearer hierarchy over the input ---------- */
-.field-label {
-  font-weight: 600;
-  color: var(--theme-elevation-800);
-  margin-bottom: 6px;
+body {
+  color: var(--wgb-ink);
+  background: var(--wgb-content-bg);
 }
 
-/* ---------- Helper text: default gray was too low-contrast to read ---------- */
-.field-description {
-  color: var(--theme-elevation-600);
+/* Payload sets font-size: 12px on nested containers. Force the readable
+   size through the shell — anything that wants to override for a specific
+   micro-label can still bump down. */
+.template-default,
+.dashboard,
+.collection-list,
+.collection-edit,
+.doc-header,
+.list-header,
+.app-header,
+.gutter {
+  font-size: 14px;
+  color: var(--wgb-ink);
 }
 
-/* ---------- Sidebar navigation ---------- */
+h1, h2, h3, h4 {
+  color: var(--wgb-ink-strong);
+  letter-spacing: -0.01em;
+}
+
+/* ============================================================
+ * 2. App header (top bar with user + logout)
+ * ============================================================ */
+.app-header {
+  background: #ffffff;
+  border-bottom: 1px solid var(--wgb-card-border);
+  padding-top: 10px;
+  padding-bottom: 10px;
+}
+
+/* ============================================================
+ * 3. Sidebar navigation
+ * ============================================================ */
 .nav {
   background: var(--wgb-zone-bg);
   border-right: 1px solid var(--wgb-zone-border);
+  padding-top: 8px;
 }
 
 .nav-group__label,
 .nav-group__toggle {
-  color: var(--theme-elevation-600);
+  color: var(--wgb-ink-soft);
 }
 
 .nav-group__label {
   font-weight: 700;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.06em;
   text-transform: uppercase;
   font-size: 11px;
+  padding: 12px 12px 6px;
 }
 
 .nav__link {
-  padding-top: 7px;
-  padding-bottom: 7px;
-  padding-left: 10px;
-  border-radius: 6px;
-  margin-bottom: 2px;
-  transition: background-color 0.15s ease;
+  padding: 8px 12px;
+  border-radius: 8px;
+  margin: 1px 4px;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--wgb-ink);
+  transition:
+    background-color 0.15s ease,
+    color 0.15s ease;
 }
 
 .nav__link:hover {
   background: var(--wgb-brand-tint);
+  color: var(--wgb-brand-dark);
 }
 
 /* "Where am I" — Payload's default Nav has no active-page indicator at
@@ -77,50 +146,275 @@
   color: var(--wgb-brand-dark);
 }
 
-/* ---------- Inputs: firmer border + on-brand focus ring ---------- */
+/* ============================================================
+ * 4. Content shell — bigger gutters, off-white backdrop
+ * ============================================================ */
+.template-default__wrap {
+  background: var(--wgb-content-bg);
+}
+
+.dashboard,
+.collection-list,
+.collection-edit,
+.global-edit {
+  background: var(--wgb-content-bg);
+}
+
+/* ============================================================
+ * 5. Dashboard cards (the collection tiles on /admin)
+ * ============================================================ */
+.dashboard .card,
+.card {
+  background: var(--wgb-card-bg);
+  border: 1px solid var(--wgb-card-border);
+  border-radius: 12px;
+  box-shadow: var(--wgb-card-shadow);
+  padding: 20px 22px;
+  transition:
+    transform 0.15s ease,
+    box-shadow 0.15s ease,
+    border-color 0.15s ease;
+}
+
+.dashboard .card:hover,
+.card:hover {
+  transform: translateY(-1px);
+  border-color: var(--wgb-brand);
+  box-shadow:
+    0 4px 6px rgba(15, 30, 20, 0.05),
+    0 10px 15px rgba(15, 30, 20, 0.08);
+}
+
+.card__title,
+.card h3,
+.card h4 {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--wgb-ink-strong);
+}
+
+/* ============================================================
+ * 6. Collection list — title, filters, table wrapper
+ * ============================================================ */
+.list-header {
+  background: transparent;
+  padding-top: 24px;
+  padding-bottom: 12px;
+}
+
+.list-header__title {
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--wgb-ink-strong);
+  letter-spacing: -0.015em;
+}
+
+/* Wrap the actual table in a card. The Payload table sits inside
+   .collection-list__wrap; give the wrap the card treatment so the table
+   reads as an elevated panel over the off-white content backdrop. */
+.collection-list__wrap {
+  background: transparent;
+}
+
+.collection-list .table,
+.collection-list table {
+  background: var(--wgb-card-bg);
+  border: 1px solid var(--wgb-card-border);
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: var(--wgb-card-shadow);
+}
+
+.collection-list table thead th {
+  background: #f7f9f7;
+  border-bottom: 1px solid var(--wgb-card-border);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  color: var(--wgb-ink-soft);
+  padding: 12px 14px;
+}
+
+.collection-list table tbody td {
+  padding: 12px 14px;
+  border-bottom: 1px solid #f0f2f0;
+  color: var(--wgb-ink);
+  font-size: 14px;
+}
+
+.collection-list table tbody tr:hover {
+  background: #f7faf8;
+}
+
+/* Pills / filter chips at the top of the list */
+.pill,
+.pill--style-light {
+  border-radius: 999px;
+  border: 1px solid var(--wgb-card-border);
+  background: var(--wgb-card-bg);
+  color: var(--wgb-ink);
+  font-size: 13px;
+  padding: 4px 12px;
+}
+
+/* ============================================================
+ * 7. Doc header (title + tabs on edit views)
+ * ============================================================ */
+.doc-header {
+  background: var(--wgb-zone-bg);
+  border-bottom: 1px solid var(--wgb-zone-border);
+  padding-top: 20px;
+  padding-bottom: 12px;
+}
+
+.doc-header__title,
+.doc-header h1 {
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--wgb-ink-strong);
+}
+
+/* ============================================================
+ * 8. Field labels + descriptions
+ * ============================================================ */
+.field-label {
+  font-weight: 600;
+  font-size: 13px;
+  color: var(--wgb-ink-strong);
+  margin-bottom: 6px;
+  letter-spacing: 0.005em;
+}
+
+.field-description {
+  color: var(--wgb-ink-soft);
+  font-size: 12.5px;
+  margin-top: 4px;
+  line-height: 1.45;
+}
+
+/* ============================================================
+ * 9. Inputs — white background, firmer border, brand focus
+ * ============================================================ */
 input[type="text"],
 input[type="email"],
 input[type="number"],
 input[type="password"],
 input[type="date"],
+input[type="search"],
 textarea,
 select {
-  border-color: var(--theme-elevation-200);
+  background: var(--wgb-card-bg);
+  border: 1px solid var(--wgb-card-border);
+  border-radius: 8px;
+  color: var(--wgb-ink);
+  font-size: 14px;
+  padding: 9px 12px;
+  transition:
+    border-color 0.15s ease,
+    box-shadow 0.15s ease;
+}
+
+input:hover,
+textarea:hover,
+select:hover {
+  border-color: #c8cec8;
 }
 
 input:focus,
 textarea:focus,
 select:focus {
+  outline: none;
   border-color: var(--wgb-brand);
-  box-shadow: 0 0 0 2px var(--wgb-brand-tint);
+  box-shadow: 0 0 0 3px var(--wgb-brand-tint);
 }
 
-/* ---------- Doc header (title + tabs bar): its own zone, not flat white ---------- */
-.doc-header {
-  background: var(--wgb-zone-bg);
-  border-bottom: 1px solid var(--wgb-zone-border);
-}
-
-/* ---------- Tabs: clearer separation + brand active state ---------- */
+/* ============================================================
+ * 10. Tabs (SEO / GEO / etc. tabs inside forms)
+ * ============================================================ */
 .tabs-field__tabs {
-  border-bottom: 1px solid var(--theme-elevation-150);
+  border-bottom: 1px solid var(--wgb-card-border);
+  gap: 4px;
+}
+
+.tabs-field__tab-button {
+  color: var(--wgb-ink-soft);
+  padding: 10px 16px;
+  font-weight: 500;
+  border-radius: 8px 8px 0 0;
+}
+
+.tabs-field__tab-button:hover {
+  color: var(--wgb-ink-strong);
+  background: rgba(47, 128, 73, 0.05);
 }
 
 .tabs-field__tab-button--active {
   color: var(--wgb-brand-dark);
+  font-weight: 600;
+  border-bottom: 2px solid var(--wgb-brand);
 }
 
-/* ---------- Nested groups (e.g. "Plano de fundo"): visible card boundary
-   — previously had no border/background, so it blended flat into the page ---------- */
+/* ============================================================
+ * 11. Group fields — clear card boundary
+ * ============================================================ */
 .group-field {
-  border: 1px solid var(--theme-elevation-150);
-  border-radius: 8px;
-  background: var(--theme-elevation-50);
-  padding: 16px 20px;
-  margin: 10px 0;
+  border: 1px solid var(--wgb-card-border);
+  border-radius: 12px;
+  background: var(--wgb-card-bg);
+  padding: 20px 22px;
+  margin: 14px 0;
 }
 
-/* ---------- Collapsible rows (array items like "Slide 01"): tinted header ---------- */
+.group-field__title,
+.group-field h3 {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--wgb-ink-strong);
+  margin-bottom: 6px;
+}
+
+/* ============================================================
+ * 12. Collapsibles (array items like "Slide 01", FAQ entries)
+ * ============================================================ */
+.collapsible {
+  border: 1px solid var(--wgb-card-border);
+  border-radius: 10px;
+  background: var(--wgb-card-bg);
+  margin: 8px 0;
+  overflow: hidden;
+}
+
 .collapsible__toggle {
-  background: var(--theme-elevation-50);
+  background: #f7faf8;
+  border-bottom: 1px solid var(--wgb-card-border);
+  padding: 12px 14px;
+  font-weight: 500;
+}
+
+.collapsible__toggle:hover {
+  background: var(--wgb-brand-tint);
+}
+
+/* ============================================================
+ * 13. Buttons — primary is brand green, secondaries are ghost
+ * ============================================================ */
+.btn--style-primary:not(.btn--disabled) {
+  --bg-color: var(--wgb-brand);
+  --hover-bg: var(--wgb-brand-dark);
+  box-shadow: 0 1px 2px rgba(33, 96, 47, 0.15);
+  font-weight: 600;
+}
+
+.btn {
+  border-radius: 8px;
+  transition:
+    background-color 0.15s ease,
+    color 0.15s ease,
+    border-color 0.15s ease,
+    box-shadow 0.15s ease;
+}
+
+.btn--style-secondary {
+  border: 1px solid var(--wgb-card-border);
 }
