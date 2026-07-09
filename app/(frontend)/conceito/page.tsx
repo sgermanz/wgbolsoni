@@ -2,7 +2,9 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import { Reveal } from "@/components/reveal";
 import { RichBody } from "@/components/rich-body";
+import { BooksSection } from "@/components/books-section";
 import { getPageBySlug } from "@/lib/content";
+import { listBooks } from "@/lib/books";
 
 export const metadata: Metadata = {
   title: "Conceito",
@@ -15,7 +17,10 @@ export const metadata: Metadata = {
 export const revalidate = 60;
 
 export default async function ConceitoPage() {
-  const page = await getPageBySlug("conceito");
+  const [page, books] = await Promise.all([
+    getPageBySlug("conceito"),
+    listBooks(),
+  ]);
   const cover = page?.cover;
 
   return (
@@ -119,6 +124,11 @@ export default async function ConceitoPage() {
           </Reveal>
         </div>
       </section>
+
+      <BooksSection
+        books={books}
+        subtitle="A bibliografia que traduz o pensamento de longo prazo em texto."
+      />
     </>
   );
 }
