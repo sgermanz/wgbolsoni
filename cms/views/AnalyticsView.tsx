@@ -7,6 +7,8 @@ import {
   type GA4Range,
   type SCRange,
 } from "@/lib/analytics";
+import { getStoredAnalyticsSettings } from "@/cms/analytics-settings";
+import AnalyticsApiSettings from "@/cms/components/AnalyticsApiSettings";
 
 type SearchParams = { range?: string; tab?: string };
 
@@ -33,10 +35,11 @@ export default async function AnalyticsView({
 }: AdminViewServerProps & { searchParams?: SearchParams }) {
   const range = pickRange(searchParams?.range);
   const tab = searchParams?.tab === "apis" ? "apis" : "overview";
-  const integrations = getAnalyticsIntegrationStatus();
+  const settings = await getStoredAnalyticsSettings();
+  const integrations = getAnalyticsIntegrationStatus(settings);
   const [ga4, sc] = await Promise.all([
-    fetchGA4Summary(range as GA4Range),
-    fetchSearchConsoleSummary(range as SCRange),
+    fetchGA4Summary(range as GA4Range, settings),
+    fetchSearchConsoleSummary(range as SCRange, settings),
   ]);
 
   const tabHref = (nextTab: "overview" | "apis") =>
@@ -200,8 +203,7 @@ function SearchTable({ rows }: { rows: { query: string; clicks: number; impressi
 }
 
 function ApiPanel({ status }: { status: ReturnType<typeof getAnalyticsIntegrationStatus> }) {
-  const serviceLabel = status.serviceAccount === "ready" ? "Configurada" : status.serviceAccount === "invalid" ? "JSON invalido" : "Nao configurada";
-  return <section style={styles.apiPanel}><div style={styles.apiIntro}><p style={styles.eyebrow}>CONEXOES SEGURAS</p><h2 style={styles.apiTitle}>APIs</h2><p style={styles.apiDescription}>As chaves ficam somente nas variaveis protegidas do Railway. Este painel confirma a configuracao sem expor nenhum dado sensivel.</p></div><div style={styles.integrationGrid}><IntegrationCard name="Google Analytics 4" description="Visitas, origem do trafego, paginas e dispositivos." ready={status.ga4PropertyId && status.serviceAccount === "ready"} fields={[{ name: "GA4_PROPERTY_ID", ready: status.ga4PropertyId }, { name: "GOOGLE_SERVICE_ACCOUNT_JSON", ready: status.serviceAccount === "ready", note: status.serviceAccount === "invalid" ? "O JSON precisa ser valido." : undefined }]} /><IntegrationCard name="Google Search Console" description="Buscas, cliques, impressoes e posicao no Google." ready={status.searchConsoleSiteUrl && status.serviceAccount === "ready"} fields={[{ name: "SEARCH_CONSOLE_SITE_URL", ready: status.searchConsoleSiteUrl }, { name: "GOOGLE_SERVICE_ACCOUNT_JSON", ready: status.serviceAccount === "ready", note: status.serviceAccount === "invalid" ? "O JSON precisa ser valido." : undefined }]} /></div><div style={styles.apiHow}><p style={styles.cardKicker}>COMO CONECTAR</p><ol style={styles.steps}><li>Crie uma Service Account no Google Cloud e habilite as APIs Google Analytics Data e Search Console.</li><li>Adicione o e-mail da Service Account como leitor na propriedade GA4 e como usuario no Search Console.</li><li>No Railway, abra o servico <strong>wgbolsoni</strong>, entre em <strong>Variables</strong> e preencha as variaveis acima.</li><li>Depois do proximo deploy, os dados comecam a aparecer aqui. A atualizacao e feita a cada 15 minutos.</li></ol></div></section>;
+  return <section style={styles.apiPanel}><div style={styles.apiIntro}><p style={styles.eyebrow}>CONEXOES SEGURAS</p><h2 style={styles.apiTitle}>APIs</h2><p style={styles.apiDescription}>Salve os identificadores da propriedade aqui. A chave secreta da Service Account permanece protegida no Railway.</p></div><div style={styles.integrationGrid}><IntegrationCard name="Google Analytics 4" description="Visitas, origem do trafego, paginas e dispositivos." ready={status.ga4PropertyId && status.serviceAccount === "ready"} fields={[{ name: "GA4 Property ID", ready: status.ga4PropertyId }, { name: "Service Account no Railway", ready: status.serviceAccount === "ready", note: status.serviceAccount === "invalid" ? "O JSON no Railway precisa ser valido." : undefined }]} /><IntegrationCard name="Google Search Console" description="Buscas, cliques, impressoes e posicao no Google." ready={status.searchConsoleSiteUrl && status.serviceAccount === "ready"} fields={[{ name: "URL da propriedade", ready: status.searchConsoleSiteUrl }, { name: "Service Account no Railway", ready: status.serviceAccount === "ready", note: status.serviceAccount === "invalid" ? "O JSON no Railway precisa ser valido." : undefined }]} /></div><div style={styles.apiHow}><p style={styles.cardKicker}>CONFIGURAR E SALVAR</p><AnalyticsApiSettings hasServiceAccount={status.serviceAccount === "ready"} /></div></section>;
 }
 
 function IntegrationCard({ name, description, ready, fields }: { name: string; description: string; ready: boolean; fields: { name: string; ready: boolean; note?: string }[] }) {

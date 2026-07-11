@@ -21,6 +21,7 @@ import { Books } from "./cms/collections/Books";
 import { ContactMessages } from "./cms/collections/ContactMessages";
 import { SiteSettings } from "./cms/globals/SiteSettings";
 import { HomeHero } from "./cms/globals/HomeHero";
+import { AnalyticsSettings } from "./cms/globals/AnalyticsSettings";
 import { seed } from "./cms/seed";
 
 const filename = fileURLToPath(import.meta.url);
@@ -42,6 +43,7 @@ export default buildConfig({
     importMap: { baseDir: path.resolve(dirname) },
     meta: { titleSuffix: "— WG Bolsoni" },
     components: {
+      beforeDashboard: ["@/cms/components/DashboardAnalytics#default"],
       views: {
         analytics: {
           Component: "@/cms/views/AnalyticsView#default",
@@ -96,7 +98,7 @@ export default buildConfig({
     Books,
     ContactMessages,
   ],
-  globals: [SiteSettings, HomeHero],
+  globals: [SiteSettings, HomeHero, AnalyticsSettings],
   onInit: async (payload) => {
     if (process.env.PAYLOAD_DISABLE_SEED === "true") return;
     try {

@@ -17,6 +17,11 @@ import { GoogleAuth, type JWTInput } from "google-auth-library";
 const CACHE_TTL_MS = 15 * 60 * 1000;
 const memo = new Map<string, { at: number; value: unknown }>();
 
+export type AnalyticsSettingsInput = {
+  ga4PropertyId?: string;
+  searchConsoleSiteUrl?: string;
+};
+
 function cached<T>(key: string, ttl = CACHE_TTL_MS) {
   const e = memo.get(key);
   if (e && Date.now() - e.at < ttl) return e.value as T;
@@ -48,7 +53,9 @@ export type AnalyticsIntegrationStatus = {
  * no secret values, only whether each integration has enough configuration to
  * make a request.
  */
-export function getAnalyticsIntegrationStatus(): AnalyticsIntegrationStatus {
+export function getAnalyticsIntegrationStatus(
+  settings: AnalyticsSettingsInput = {},
+): AnalyticsIntegrationStatus {
   const raw = process.env.GOOGLE_SERVICE_ACCOUNT_JSON;
   let serviceAccount: AnalyticsIntegrationStatus["serviceAccount"] = "missing";
 
@@ -62,8 +69,10 @@ export function getAnalyticsIntegrationStatus(): AnalyticsIntegrationStatus {
   }
 
   return {
-    ga4PropertyId: Boolean(process.env.GA4_PROPERTY_ID),
-    searchConsoleSiteUrl: Boolean(process.env.SEARCH_CONSOLE_SITE_URL),
+    ga4PropertyId: Boolean(settings.ga4PropertyId || process.env.GA4_PROPERTY_ID),
+    searchConsoleSiteUrl: Boolean(
+      settings.searchConsoleSiteUrl || process.env.SEARCH_CONSOLE_SITE_URL,
+    ),
     serviceAccount,
   };
 }
@@ -96,8 +105,9 @@ const GA4_RANGE_DAYS: Record<GA4Range, number> = {
 
 export async function fetchGA4Summary(
   range: GA4Range = "28d",
+  settings: AnalyticsSettingsInput = {},
 ): Promise<GA4Summary | null> {
-  const propertyId = process.env.GA4_PROPERTY_ID;
+  const propertyId = settings.ga4PropertyId || process.env.GA4_PROPERTY_ID;
   if (!propertyId) return null;
 
   const key = `ga4:${propertyId}:${range}`;
@@ -210,8 +220,9 @@ function isoDaysAgo(n: number) {
 
 export async function fetchSearchConsoleSummary(
   range: SCRange = "28d",
+  settings: AnalyticsSettingsInput = {},
 ): Promise<SCSummary | null> {
-  const siteUrl = process.env.SEARCH_CONSOLE_SITE_URL;
+  const siteUrl = settings.searchConsoleSiteUrl || process.env.SEARCH_CONSOLE_SITE_URL;
   if (!siteUrl) return null;
 
   const key = `sc:${siteUrl}:${range}`;
