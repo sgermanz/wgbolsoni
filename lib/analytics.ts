@@ -37,6 +37,37 @@ function getServiceAccountCreds(): JWTInput | null {
   }
 }
 
+export type AnalyticsIntegrationStatus = {
+  ga4PropertyId: boolean;
+  searchConsoleSiteUrl: boolean;
+  serviceAccount: "missing" | "invalid" | "ready";
+};
+
+/**
+ * Configuration state intended for the admin UI. This deliberately exposes
+ * no secret values, only whether each integration has enough configuration to
+ * make a request.
+ */
+export function getAnalyticsIntegrationStatus(): AnalyticsIntegrationStatus {
+  const raw = process.env.GOOGLE_SERVICE_ACCOUNT_JSON;
+  let serviceAccount: AnalyticsIntegrationStatus["serviceAccount"] = "missing";
+
+  if (raw) {
+    try {
+      JSON.parse(raw);
+      serviceAccount = "ready";
+    } catch {
+      serviceAccount = "invalid";
+    }
+  }
+
+  return {
+    ga4PropertyId: Boolean(process.env.GA4_PROPERTY_ID),
+    searchConsoleSiteUrl: Boolean(process.env.SEARCH_CONSOLE_SITE_URL),
+    serviceAccount,
+  };
+}
+
 async function getAuthClient(scopes: string[]) {
   const credentials = getServiceAccountCreds();
   if (!credentials) return null;
