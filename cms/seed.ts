@@ -149,10 +149,11 @@ async function backfillConceitoBooksSection(payload: Payload): Promise<void> {
     if (!doc) return;
 
     const section = doc.booksSection;
-    const alreadyConfigured =
-      section &&
-      ("eyebrow" in section || "heading" in section || "intro" in section);
-    if (alreadyConfigured) return;
+    const hasEditorText =
+      Boolean(section?.eyebrow?.trim()) ||
+      Boolean(section?.heading?.trim()) ||
+      Boolean(section?.intro?.trim());
+    if (hasEditorText) return;
 
     await payload.update({
       collection: "pages",
