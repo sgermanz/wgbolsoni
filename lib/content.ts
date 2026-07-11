@@ -39,6 +39,11 @@ export type PageRecord = {
   bodyLexical?: SerializedEditorState;
   bodyParagraphs?: string[];
   cover?: AreaCover;
+  booksSection?: {
+    eyebrow?: string;
+    heading?: string;
+    intro?: string;
+  };
 };
 
 export type SiteSettingsRecord = {
@@ -176,6 +181,11 @@ export async function getPageBySlug(
             title: string;
             subtitle?: string | null;
             body?: SerializedEditorState | null;
+            booksSection?: {
+              eyebrow?: string | null;
+              heading?: string | null;
+              intro?: string | null;
+            } | null;
             coverImage?:
               | {
                   url?: string | null;
@@ -204,6 +214,13 @@ export async function getPageBySlug(
         subtitle: doc.subtitle ?? undefined,
         bodyLexical: doc.body ?? undefined,
         cover,
+        booksSection: doc.booksSection
+          ? {
+              eyebrow: doc.booksSection.eyebrow ?? undefined,
+              heading: doc.booksSection.heading ?? undefined,
+              intro: doc.booksSection.intro ?? undefined,
+            }
+          : undefined,
       };
     },
     undefined,

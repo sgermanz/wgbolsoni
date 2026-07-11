@@ -45,6 +45,39 @@ export const Pages: CollectionConfig = {
           "Foto exibida ao lado do texto (formato retrato, proporção 9:16). Deixe em branco para o texto ocupar a largura toda.",
       },
     },
+    {
+      name: "booksSection",
+      type: "group",
+      label: "Seção de livros",
+      admin: {
+        description:
+          "Textos que aparecem acima dos cards de livros do autor no fim da página. Só é exibida se houver ao menos um livro publicado.",
+        // Só aparece na página Conceito — nas outras (Políticas etc.) fica
+        // escondido para não poluir o formulário.
+        condition: (data) => data?.slug === "conceito",
+      },
+      fields: [
+        {
+          name: "eyebrow",
+          type: "text",
+          label: "Selo (texto pequeno acima do título)",
+          admin: { description: "Ex.: BIBLIOGRAFIA. Deixe em branco para ocultar." },
+        },
+        {
+          name: "heading",
+          type: "text",
+          label: "Título da seção",
+          admin: { description: "Padrão: “Livros do autor”." },
+        },
+        {
+          name: "intro",
+          type: "textarea",
+          label: "Texto de apresentação",
+          maxLength: 240,
+          admin: { description: "Uma frase curta que introduz a bibliografia." },
+        },
+      ],
+    },
     seoGroup,
   ],
 };

@@ -64,6 +64,12 @@ const CONCEITO_BODY = buildLexical([
 const CONCEITO_LEGACY_MARKER =
   "nasceu como holding de participações em 2016";
 
+const CONCEITO_BOOKS_SECTION = {
+  eyebrow: "Bibliografia",
+  heading: "Livros do autor",
+  intro: "A bibliografia que traduz o pensamento de longo prazo em texto.",
+};
+
 /**
  * Idempotent seed runner. Called from `onInit` in payload.config.ts on every
  * boot, but only inserts records when their collections/globals are still
@@ -78,6 +84,7 @@ export async function seed(payload: Payload): Promise<void> {
   await seedAreas(payload);
   await seedPages(payload);
   await backfillConceitoBody(payload);
+  await backfillConceitoBooksSection(payload);
   await seedSiteSettings(payload);
   await seedHomeHero(payload);
   await seedBlogPosts(payload);
@@ -117,6 +124,45 @@ async function backfillConceitoBody(payload: Payload): Promise<void> {
   } catch (error) {
     payload.logger.warn(
       `[seed] conceito body backfill skipped: ${(error as Error).message}`,
+    );
+  }
+}
+
+async function backfillConceitoBooksSection(payload: Payload): Promise<void> {
+  try {
+    const res = await payload.find({
+      collection: "pages",
+      where: { slug: { equals: "conceito" } },
+      limit: 1,
+      pagination: false,
+    });
+    const doc = res.docs[0] as
+      | {
+          id: string | number;
+          booksSection?: {
+            eyebrow?: string | null;
+            heading?: string | null;
+            intro?: string | null;
+          } | null;
+        }
+      | undefined;
+    if (!doc) return;
+
+    const section = doc.booksSection;
+    const alreadyConfigured =
+      section &&
+      ("eyebrow" in section || "heading" in section || "intro" in section);
+    if (alreadyConfigured) return;
+
+    await payload.update({
+      collection: "pages",
+      id: doc.id,
+      data: { booksSection: CONCEITO_BOOKS_SECTION } as never,
+    });
+    payload.logger.info("[seed] conceito books section: defaults inserted");
+  } catch (error) {
+    payload.logger.warn(
+      `[seed] conceito books section backfill skipped: ${(error as Error).message}`,
     );
   }
 }
@@ -223,6 +269,7 @@ async function seedPages(payload: Payload) {
       subtitle:
         "Holding de participações desde 2016 — capital, governança e visão setorial.",
       body: CONCEITO_BODY,
+      booksSection: CONCEITO_BOOKS_SECTION,
     } as never,
   });
 

@@ -22,6 +22,7 @@ export default async function ConceitoPage() {
     listBooks(),
   ]);
   const cover = page?.cover;
+  const booksSection = page?.booksSection;
 
   return (
     <>
@@ -127,7 +128,12 @@ export default async function ConceitoPage() {
 
       <BooksSection
         books={books}
-        subtitle="A bibliografia que traduz o pensamento de longo prazo em texto."
+        eyebrow={booksSection?.eyebrow}
+        title={booksSection?.heading || undefined}
+        subtitle={
+          booksSection?.intro ??
+          "A bibliografia que traduz o pensamento de longo prazo em texto."
+        }
       />
     </>
   );

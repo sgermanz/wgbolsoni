@@ -17,24 +17,29 @@ type Props = {
  */
 export function BooksSection({
   books,
-  eyebrow = "Bibliografia",
-  title = "Livros do autor",
+  eyebrow,
+  title,
   subtitle,
 }: Props) {
   if (books.length === 0) return null;
 
+  const resolvedEyebrow = eyebrow === undefined ? "Bibliografia" : eyebrow;
+  const resolvedTitle = title || "Livros do autor";
+
   return (
     <section className="border-t border-[var(--border)] bg-[var(--surface-2)]">
       <div className="mx-auto max-w-6xl px-5 py-16 lg:px-8 lg:py-24">
-        <Reveal>
-          <p className="mb-3 inline-flex items-center gap-2 text-sm font-semibold uppercase tracking-wider text-brand-600 dark:text-brand-300">
-            <span className="h-px w-6 bg-brand-500" />
-            {eyebrow}
-          </p>
-        </Reveal>
+        {resolvedEyebrow && (
+          <Reveal>
+            <p className="mb-3 inline-flex items-center gap-2 text-sm font-semibold uppercase tracking-wider text-brand-600 dark:text-brand-300">
+              <span className="h-px w-6 bg-brand-500" />
+              {resolvedEyebrow}
+            </p>
+          </Reveal>
+        )}
         <Reveal delay={0.05}>
           <h2 className="text-balance max-w-3xl font-display text-[length:var(--text-fluid-2xl)] font-extrabold leading-[1.05]">
-            {title}
+            {resolvedTitle}
           </h2>
         </Reveal>
         {subtitle && (
