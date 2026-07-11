@@ -1,6 +1,5 @@
 import { ArrowUpRight, BarChart3, Search } from "lucide-react";
 
-import { getStoredAnalyticsSettings } from "@/cms/analytics-settings";
 import {
   fetchGA4Summary,
   fetchSearchConsoleSummary,
@@ -9,8 +8,22 @@ import {
 
 const nf = new Intl.NumberFormat("pt-BR");
 
-export default async function DashboardAnalytics() {
-  const settings = await getStoredAnalyticsSettings();
+export default async function DashboardAnalytics({
+  payload,
+}: {
+  payload: {
+    findGlobal: (args: { slug: "analyticsSettings" }) => Promise<{
+      ga4PropertyId?: string;
+      searchConsoleSiteUrl?: string;
+    }>;
+  };
+}) {
+  let settings: { ga4PropertyId?: string; searchConsoleSiteUrl?: string } = {};
+  try {
+    settings = await payload.findGlobal({ slug: "analyticsSettings" });
+  } catch {
+    // The card remains available even if the CMS has not created this global yet.
+  }
   const status = getAnalyticsIntegrationStatus(settings);
   const [ga4, search] = await Promise.all([
     fetchGA4Summary("28d", settings),
