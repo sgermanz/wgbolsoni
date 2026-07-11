@@ -48,7 +48,10 @@ export default buildConfig({
           path: "/analytics",
         },
       },
-      afterNavLinks: ["@/cms/components/NavActiveHighlight#default"],
+      afterNavLinks: [
+        "@/cms/components/AnalyticsNavLink#default",
+        "@/cms/components/NavActiveHighlight#default",
+      ],
       graphics: {
         Logo: "@/cms/components/AdminLogo#default",
       },
