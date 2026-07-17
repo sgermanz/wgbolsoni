@@ -131,18 +131,55 @@ export async function POST(req: Request) {
     );
   }
 
-  const to = process.env.CONTACT_TO || "wgb@wgbolsoni.net";
+  const to = process.env.CONTACT_TO || "wgbolsoni@gmail.com";
   const copyTo = process.env.CONTACT_COPY_TO || "wgb@wgbolsoni.net";
-  if (process.env.SMTP_HOST) {
-    const { html, text } = renderContactEmail({
-      name,
-      email,
-      phone,
-      subject,
-      message,
-      origin: req.headers.get("referer") || undefined,
-      receivedAt: new Date().toISOString(),
-    });
+  const resendApiKey = process.env.RESEND_API_KEY;
+  const { html, text } = renderContactEmail({
+    name,
+    email,
+    phone,
+    subject,
+    message,
+    origin: req.headers.get("referer") || undefined,
+    receivedAt: new Date().toISOString(),
+  });
+
+  if (resendApiKey) {
+    try {
+      const response = await fetch("https://api.resend.com/emails", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${resendApiKey}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          from:
+            process.env.RESEND_FROM ||
+            "WGBolsoni <site@wgbolsoni.net>",
+          to: [to],
+          bcc:
+            copyTo && copyTo.toLowerCase() !== to.toLowerCase()
+              ? [copyTo]
+              : undefined,
+          reply_to: email,
+          subject: `[Contato site] ${subject}`,
+          html,
+          text,
+        }),
+      });
+
+      if (!response.ok) {
+        const errorBody = await response.text();
+        throw new Error(`Resend ${response.status}: ${errorBody.slice(0, 500)}`);
+      }
+
+      payload.logger.info("[contact] email sent through Resend");
+    } catch (err) {
+      payload.logger.warn(
+        `[contact] message persisted but Resend send failed: ${(err as Error).message}`,
+      );
+    }
+  } else if (process.env.SMTP_HOST) {
     try {
       await payload.sendEmail({
         to,
@@ -160,7 +197,7 @@ export async function POST(req: Request) {
     }
   } else {
     payload.logger.info(
-      `[contact] message persisted (SMTP not configured — set SMTP_HOST to enable email)`,
+      "[contact] message persisted (email provider not configured — set RESEND_API_KEY)",
     );
   }
 
