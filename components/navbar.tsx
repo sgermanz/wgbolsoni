@@ -5,19 +5,30 @@ import { useEffect, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { ChevronDown, Menu, X, Sun, Moon } from "lucide-react";
 
-import { NAV_TOP } from "@/lib/site";
-import { AREAS } from "@/lib/areas";
 import { cn } from "@/lib/utils";
 import { Brand } from "@/components/brand";
 
-export function Navbar({ brandName }: { brandName: string }) {
+type NavChild = { label: string; href: string; tag?: string };
+type NavItem = { label: string; href: string; children?: NavChild[] };
+
+export function Navbar({
+  brandName,
+  navItems,
+}: {
+  brandName: string;
+  navItems: NavItem[];
+}) {
   const [open, setOpen] = useState(false);              // mobile menu
-  const [areasOpen, setAreasOpen] = useState(false);    // desktop dropdown
+  const [openDropdown, setOpenDropdown] = useState<string | null>(null);
   const [dark, setDark] = useState(false);
 
   // Lê o tema atual aplicado pelo bootstrap inline.
   useEffect(() => {
-    setDark(document.documentElement.classList.contains("dark"));
+    const frame = requestAnimationFrame(() => {
+      setDark(document.documentElement.classList.contains("dark"));
+    });
+
+    return () => cancelAnimationFrame(frame);
   }, []);
 
   const toggleTheme = () => {
@@ -53,55 +64,62 @@ export function Navbar({ brandName }: { brandName: string }) {
 
         {/* Navegação desktop */}
         <div className="hidden items-center gap-1 lg:flex">
-          {NAV_TOP.filter(n => n.href !== "/contato").map((item) => (
-            <Link key={item.href} href={item.href} className={navLink}>
-              {item.label}
-            </Link>
-          ))}
+          {navItems.map((item) => {
+            const children = item.children ?? [];
+            if (children.length === 0) {
+              return (
+                <Link key={item.href} href={item.href} className={navLink}>
+                  {item.label}
+                </Link>
+              );
+            }
 
-          {/* Dropdown Conheça Mais (áreas de atuação) */}
-          <div
-            className="relative"
-            onMouseEnter={() => setAreasOpen(true)}
-            onMouseLeave={() => setAreasOpen(false)}
-          >
-            <button
-              className={cn(navLink, "flex items-center gap-1")}
-              aria-expanded={areasOpen}
-              onClick={() => setAreasOpen(v => !v)}
-            >
-              Conheça Mais
-              <ChevronDown className={cn("h-4 w-4 transition-transform", areasOpen && "rotate-180")} />
-            </button>
-            <AnimatePresence>
-              {areasOpen && (
-                <motion.div
-                  initial={{ opacity: 0, y: 8 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: 8 }}
-                  transition={{ duration: 0.18 }}
-                  className="absolute left-0 top-full w-[420px] rounded-xl border border-[var(--border)] bg-[var(--surface-2)] p-2 shadow-2xl"
+            return (
+              <div
+                key={item.href}
+                className="relative"
+                onMouseEnter={() => setOpenDropdown(item.href)}
+                onMouseLeave={() => setOpenDropdown(null)}
+              >
+                <button
+                  className={cn(navLink, "flex items-center gap-1")}
+                  aria-expanded={openDropdown === item.href}
+                  onClick={() => setOpenDropdown((value) => value === item.href ? null : item.href)}
                 >
-                  <div className="grid grid-cols-2 gap-1">
-                    {AREAS.map((a) => (
-                      <Link
-                        key={a.slug}
-                        href={`/areas/${a.slug}`}
-                        className="block rounded-lg px-3 py-2 text-sm transition hover:bg-[var(--surface)]"
-                      >
-                        <span className="font-medium">{a.title}</span>
-                        {a.tag && (
-                          <span className="ml-2 rounded-full bg-brand-500/15 px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-brand-600 dark:text-brand-300">
-                            {a.tag}
-                          </span>
-                        )}
-                      </Link>
-                    ))}
-                  </div>
-                </motion.div>
-              )}
-            </AnimatePresence>
-          </div>
+                  {item.label}
+                  <ChevronDown className={cn("h-4 w-4 transition-transform", openDropdown === item.href && "rotate-180")} />
+                </button>
+                <AnimatePresence>
+                  {openDropdown === item.href && (
+                    <motion.div
+                      initial={{ opacity: 0, y: 8 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: 8 }}
+                      transition={{ duration: 0.18 }}
+                      className="absolute left-0 top-full w-[420px] rounded-xl border border-[var(--border)] bg-[var(--surface-2)] p-2 shadow-2xl"
+                    >
+                      <div className="grid grid-cols-2 gap-1">
+                        {children.map((child) => (
+                          <Link
+                            key={`${child.label}-${child.href}`}
+                            href={child.href}
+                            className="block rounded-lg px-3 py-2 text-sm transition hover:bg-[var(--surface)]"
+                          >
+                            <span className="font-medium">{child.label}</span>
+                            {child.tag && (
+                              <span className="ml-2 rounded-full bg-brand-500/15 px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-brand-600 dark:text-brand-300">
+                                {child.tag}
+                              </span>
+                            )}
+                          </Link>
+                        ))}
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
+            );
+          })}
         </div>
 
         <div className="ml-auto flex items-center gap-2">
@@ -144,29 +162,26 @@ export function Navbar({ brandName }: { brandName: string }) {
             className="overflow-hidden border-t border-ink-200 bg-ink-50 lg:hidden"
           >
             <div className="space-y-1 px-5 py-4">
-              {NAV_TOP.map((item) => (
-                <Link
-                  key={item.href}
-                  href={item.href}
-                  onClick={() => setOpen(false)}
-                  className="block rounded-lg px-3 py-3 text-base font-medium text-ink-800 transition hover:bg-white"
-                >
-                  {item.label}
-                </Link>
-              ))}
-              <div className="my-2 border-t border-ink-200" />
-              <p className="px-3 py-1 text-xs font-semibold uppercase tracking-wider text-ink-500">
-                Áreas de atuação
-              </p>
-              {AREAS.map((a) => (
-                <Link
-                  key={a.slug}
-                  href={`/areas/${a.slug}`}
-                  onClick={() => setOpen(false)}
-                  className="block rounded-lg px-3 py-2.5 text-sm text-ink-800 transition hover:bg-white"
-                >
-                  {a.title}
-                </Link>
+              {navItems.map((item) => (
+                <div key={item.href}>
+                  <Link
+                    href={item.href}
+                    onClick={() => setOpen(false)}
+                    className="block rounded-lg px-3 py-3 text-base font-medium text-ink-800 transition hover:bg-white"
+                  >
+                    {item.label}
+                  </Link>
+                  {item.children?.map((child) => (
+                    <Link
+                      key={`${child.label}-${child.href}`}
+                      href={child.href}
+                      onClick={() => setOpen(false)}
+                      className="ml-4 block rounded-lg px-3 py-2.5 text-sm text-ink-800 transition hover:bg-white"
+                    >
+                      {child.label}
+                    </Link>
+                  ))}
+                </div>
               ))}
             </div>
           </motion.div>
