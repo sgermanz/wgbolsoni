@@ -72,7 +72,9 @@ export default async function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   const [settings, areas] = await Promise.all([getSiteSettings(), getAllAreas()]);
-  const menuAreas = areas.filter((area) => area.showInMenu);
+  const menuAreas = areas.filter(
+    (area) => (area as { showInMenu?: boolean }).showInMenu !== false,
+  );
   const orgLd = buildOrganizationSchema(settings);
   const siteLd = buildWebsiteSchema(settings);
   const bizLd = buildLocalBusinessSchema(settings);
