@@ -1,16 +1,28 @@
 import Link from "next/link";
-import { SITE, NAV_TOP } from "@/lib/site";
-import { AREAS } from "@/lib/areas";
+import { SITE } from "@/lib/site";
 import { Brand } from "@/components/brand";
+
+type NavItem = { label: string; href: string };
+type MenuArea = { slug: string; title: string };
+type SocialLink = { platform: string; url: string };
 
 type Props = {
   brandName: string;
   tagline: string;
-  email: string;
   copyrightStart: number;
+  navItems: NavItem[];
+  areas: MenuArea[];
+  social?: SocialLink[];
 };
 
-export function Footer({ brandName, tagline, email, copyrightStart }: Props) {
+export function Footer({
+  brandName,
+  tagline,
+  copyrightStart,
+  navItems,
+  areas,
+  social = [],
+}: Props) {
   return (
     <footer className="border-t border-[var(--border)] bg-[var(--surface-2)]">
       <div className="mx-auto max-w-7xl px-5 py-16 lg:px-8">
@@ -29,7 +41,7 @@ export function Footer({ brandName, tagline, email, copyrightStart }: Props) {
           <nav aria-label="Rodapé — navegação" className="text-sm">
             <h3 className="font-display font-semibold">Navegação</h3>
             <ul className="mt-4 space-y-2.5 text-[var(--content-soft)]">
-              {NAV_TOP.map((n) => (
+              {navItems.map((n) => (
                 <li key={n.href}>
                   <Link href={n.href} className="transition hover:text-[var(--content)]">
                     {n.label}
@@ -43,7 +55,7 @@ export function Footer({ brandName, tagline, email, copyrightStart }: Props) {
           <nav aria-label="Áreas de atuação" className="text-sm">
             <h3 className="font-display font-semibold">Áreas de atuação</h3>
             <ul className="mt-4 space-y-2.5 text-[var(--content-soft)]">
-              {AREAS.slice(0, 6).map((a) => (
+              {areas.slice(0, 6).map((a) => (
                 <li key={a.slug}>
                   <Link href={`/areas/${a.slug}`} className="transition hover:text-[var(--content)]">
                     {a.title}
@@ -53,11 +65,11 @@ export function Footer({ brandName, tagline, email, copyrightStart }: Props) {
             </ul>
           </nav>
 
-          {/* Áreas de atuação (2ª metade) + Contato */}
+          {/* Áreas de atuação (2ª metade) */}
           <div className="text-sm">
             <h3 className="font-display font-semibold">&nbsp;</h3>
             <ul className="mt-4 space-y-2.5 text-[var(--content-soft)]">
-              {AREAS.slice(6).map((a) => (
+              {areas.slice(6).map((a) => (
                 <li key={a.slug}>
                   <Link href={`/areas/${a.slug}`} className="transition hover:text-[var(--content)]">
                     {a.title}
@@ -65,14 +77,20 @@ export function Footer({ brandName, tagline, email, copyrightStart }: Props) {
                 </li>
               ))}
             </ul>
-
-            <h3 className="mt-8 font-display font-semibold">Contato</h3>
-            <a
-              href={`mailto:${email}`}
-              className="mt-3 inline-block text-[var(--content-soft)] transition hover:text-[var(--content)]"
-            >
-              {email}
-            </a>
+            {social.length > 0 && (
+              <>
+                <h3 className="mt-8 font-display font-semibold">Redes sociais</h3>
+                <ul className="mt-3 space-y-2 text-[var(--content-soft)]">
+                  {social.map((link) => (
+                    <li key={`${link.platform}-${link.url}`}>
+                      <a href={link.url} target="_blank" rel="noreferrer" className="transition hover:text-[var(--content)]">
+                        {socialLabel(link.platform)}
+                      </a>
+                    </li>
+                  ))}
+                </ul>
+              </>
+            )}
           </div>
         </div>
 
@@ -88,4 +106,16 @@ export function Footer({ brandName, tagline, email, copyrightStart }: Props) {
       </div>
     </footer>
   );
+}
+
+function socialLabel(platform: string) {
+  const labels: Record<string, string> = {
+    instagram: "Instagram",
+    linkedin: "LinkedIn",
+    youtube: "YouTube",
+    x: "X / Twitter",
+    facebook: "Facebook",
+  };
+
+  return labels[platform] || platform;
 }

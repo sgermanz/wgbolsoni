@@ -132,6 +132,7 @@ export async function POST(req: Request) {
   }
 
   const to = process.env.CONTACT_TO || "wgb@wgbolsoni.net";
+  const copyTo = process.env.CONTACT_COPY_TO || "wgb@wgbolsoni.net";
   if (process.env.SMTP_HOST) {
     const { html, text } = renderContactEmail({
       name,
@@ -145,6 +146,7 @@ export async function POST(req: Request) {
     try {
       await payload.sendEmail({
         to,
+        bcc: copyTo.toLowerCase() === to.toLowerCase() ? undefined : copyTo,
         replyTo: email,
         subject: `[Contato site] ${subject}`,
         html,

@@ -7,7 +7,7 @@ import { Navbar } from "@/components/navbar";
 import { Footer } from "@/components/footer";
 import { JsonLd } from "@/components/json-ld";
 import { SITE } from "@/lib/site";
-import { getSiteSettings } from "@/lib/content";
+import { getAllAreas, getSiteSettings } from "@/lib/content";
 import {
   buildOrganizationSchema,
   buildWebsiteSchema,
@@ -71,7 +71,8 @@ const themeBootstrap = `
 export default async function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
-  const settings = await getSiteSettings();
+  const [settings, areas] = await Promise.all([getSiteSettings(), getAllAreas()]);
+  const menuAreas = areas.filter((area) => area.showInMenu);
   const orgLd = buildOrganizationSchema(settings);
   const siteLd = buildWebsiteSchema(settings);
   const bizLd = buildLocalBusinessSchema(settings);
@@ -98,15 +99,17 @@ export default async function RootLayout({
         >
           Pular para o conteúdo
         </a>
-        <Navbar brandName={settings.name} />
+        <Navbar brandName={settings.name} navItems={settings.navTop} />
         <main id="main" className="flex-1">
           {children}
         </main>
         <Footer
           brandName={settings.name}
           tagline={settings.tagline}
-          email={settings.email}
           copyrightStart={settings.copyrightStart}
+          navItems={settings.navTop}
+          areas={menuAreas}
+          social={settings.social}
         />
       </body>
     </html>
