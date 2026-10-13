@@ -31,7 +31,7 @@ export default async function HomePage() {
         <SectionHeading
           eyebrow="Áreas de atuação"
           title={`${areas.length} frentes que se conectam`}
-          subtitle="Cada uma delas com história, parceiros e estratégia próprios — e todas alinhadas à agenda ambiental e produtiva do grupo."
+          subtitle="Cada uma delas com história, parceiros e estratégias próprias, todas alinhadas à agenda ambiental e produtiva de nossa organização"
         />
 
         <div className="mt-14 grid gap-5 md:grid-cols-2 lg:grid-cols-3">
