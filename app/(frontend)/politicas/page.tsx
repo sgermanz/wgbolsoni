@@ -1,5 +1,11 @@
 import type { Metadata } from "next";
 import { Reveal } from "@/components/reveal";
+import { RichBody } from "@/components/rich-body";
+import type { SerializedEditorState } from "@payloadcms/richtext-lexical/lexical";
+import { withFallback } from "@/lib/cms";
+
+// Read the published document on every request, never an autosaved draft.
+export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
   title: "Políticas",
@@ -7,7 +13,29 @@ export const metadata: Metadata = {
     "Princípios de conduta, governança, sustentabilidade e privacidade da WG Bolsoni.",
 };
 
-export default function PoliticasPage() {
+export default async function PoliticasPage() {
+  const page = await withFallback(
+    async (payload) => {
+      const result = await payload.find({
+        collection: "pages",
+        where: {
+          and: [
+            { slug: { equals: "politicas" } },
+            { _status: { equals: "published" } },
+          ],
+        },
+        draft: false,
+        limit: 1,
+        depth: 1,
+      });
+      return result.docs[0] as unknown as
+        | { subtitle?: string | null; body?: SerializedEditorState | null }
+        | undefined;
+    },
+    undefined,
+    "PoliticasPage",
+  );
+
   return (
     <>
       <section className="relative isolate overflow-hidden border-b border-[var(--border)]">
@@ -24,7 +52,7 @@ export default function PoliticasPage() {
           </Reveal>
           <Reveal delay={0.05}>
             <h1 className="text-balance max-w-3xl font-display text-[length:var(--text-fluid-3xl)] font-extrabold leading-[1.02]">
-              Princípios que guiam nossa atuação.
+              {page?.subtitle || "Princípios que guiam nossa atuação."}
             </h1>
           </Reveal>
         </div>
@@ -32,6 +60,9 @@ export default function PoliticasPage() {
 
       <section className="mx-auto max-w-3xl px-5 py-16 lg:px-8 lg:py-24">
         <Reveal>
+          {page?.body?.root ? (
+            <RichBody lexical={page.body} />
+          ) : (
           <div className="prose">
             <h2>Conduta e ética</h2>
             <p>
@@ -78,6 +109,7 @@ export default function PoliticasPage() {
               podem ser enviadas pelo nosso canal de contato.
             </p>
           </div>
+          )}
         </Reveal>
       </section>
     </>
