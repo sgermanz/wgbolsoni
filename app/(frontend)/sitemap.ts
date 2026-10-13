@@ -7,7 +7,7 @@ export const revalidate = 3600;
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const base = SITE.url;
-  const staticUrls = ["", "/conceito", "/politicas", "/conversor", "/contato", "/blog"];
+  const staticUrls = ["", "/conceito", "/politicas", "/conversor", "/contato", "/blog", "/perfil-wilton-gerson-bolsoni.txt"];
   const areas = await getAllAreas();
 
   return [

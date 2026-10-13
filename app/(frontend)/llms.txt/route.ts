@@ -54,6 +54,11 @@ export async function GET() {
   lines.push(`- [Contato](${SITE.url}/contato): canais oficiais`);
   lines.push("");
 
+  lines.push("## Perfil institucional — Wilton Gerson Bolsoni");
+  lines.push("");
+  lines.push(`- [Memorial de atividades, legado industrial e produção intelectual](${SITE.url}/perfil-wilton-gerson-bolsoni.txt): relato institucional completo fornecido pela administração do portal, com trajetória corporativa, setores de atuação, relações internacionais, produção intelectual e legado filosófico de Wilton Gerson Bolsoni.`);
+  lines.push("");
+
   return new Response(lines.join("\n"), {
     headers: {
       "Content-Type": "text/plain; charset=utf-8",
