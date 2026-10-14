@@ -1,6 +1,7 @@
+import { localizePage, localizeMetadata, getLocale, translateContent } from "@/lib/i18n/server";
 import type { Metadata } from "next";
 import Image from "next/image";
-import Link from "next/link";
+import { LocaleLink as Link } from "@/components/locale-provider";
 import { ArrowRight, Clock } from "lucide-react";
 
 import {
@@ -11,10 +12,11 @@ import {
 import { Reveal } from "@/components/reveal";
 import { SectionHeading } from "@/components/section-heading";
 import { SITE } from "@/lib/site";
+import { LOCALE_INFO, type Locale } from "@/lib/i18n/routing";
 
 type SearchParams = { cat?: string; page?: string; tag?: string };
 
-export const metadata: Metadata = {
+const baseMetadata: Metadata = {
   title: "Blog",
   description: `Análises, mercado e atualizações das frentes da ${SITE.name}.`,
   alternates: { canonical: `${SITE.url}/blog` },
@@ -23,9 +25,9 @@ export const metadata: Metadata = {
 const isCategory = (v?: string): v is PostCategory =>
   !!v && v in POST_CATEGORY_LABELS;
 
-const formatDate = (iso?: string) =>
+const formatDate = (iso: string | undefined, locale: Locale) =>
   iso
-    ? new Date(iso).toLocaleDateString("pt-BR", {
+    ? new Date(iso).toLocaleDateString(LOCALE_INFO[locale].intl, {
         day: "2-digit",
         month: "long",
         year: "numeric",
@@ -38,6 +40,7 @@ export default async function BlogPage({
   searchParams: Promise<SearchParams>;
 }) {
   const sp = await searchParams;
+  const locale = await getLocale();
   const page = Math.max(1, Number(sp.page ?? 1));
   const category = isCategory(sp.cat) ? sp.cat : undefined;
   const tag = sp.tag;
@@ -54,7 +57,7 @@ export default async function BlogPage({
     return qs ? `/blog?${qs}` : "/blog";
   };
 
-  return (
+  return localizePage((
     <>
       <section className="relative isolate overflow-hidden border-b border-[var(--border)]">
         <div
@@ -68,9 +71,9 @@ export default async function BlogPage({
               title="Análises, mercado e bastidores das nossas frentes."
               subtitle={
                 tag
-                  ? `Matérias com a tag #${tag}.`
+                  ? translateContent(locale, "Matérias com a tag #{tag}.", { tag: translateContent(locale, tag) })
                   : category
-                    ? `Categoria: ${POST_CATEGORY_LABELS[category]}.`
+                    ? translateContent(locale, "Categoria: {category}.", { category: translateContent(locale, POST_CATEGORY_LABELS[category]) })
                     : "Conteúdo direto de quem está construindo as próximas frentes do agronegócio, energia e meio ambiente brasileiros."
               }
             />
@@ -153,7 +156,7 @@ export default async function BlogPage({
                       {post.excerpt}
                     </p>
                     <div className="mt-auto pt-5 flex items-center justify-between text-xs text-[var(--content-soft)]">
-                      <span>{formatDate(post.publishedAt)}</span>
+                      <span>{formatDate(post.publishedAt, locale)}</span>
                       {post.readingTime && (
                         <span className="inline-flex items-center gap-1">
                           <Clock className="h-3 w-3" />
@@ -180,7 +183,7 @@ export default async function BlogPage({
               </Link>
             )}
             <span className="text-[var(--content-soft)]">
-              Página {page} de {totalPages}
+              {translateContent(locale, "Página {page} de {total}", { page, total: totalPages })}
             </span>
             {page < totalPages && (
               <Link
@@ -195,5 +198,7 @@ export default async function BlogPage({
         )}
       </section>
     </>
-  );
+  ));
 }
+
+export async function generateMetadata(): Promise<Metadata> { return localizeMetadata(baseMetadata); }

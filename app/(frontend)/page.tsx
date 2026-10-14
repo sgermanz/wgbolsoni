@@ -1,5 +1,6 @@
+import { localizePage, getLocale, translateContent } from "@/lib/i18n/server";
 import Image from "next/image";
-import Link from "next/link";
+import { LocaleLink as Link } from "@/components/locale-provider";
 import { ArrowRight } from "lucide-react";
 
 import { getAllAreas } from "@/lib/content";
@@ -17,8 +18,9 @@ export const revalidate = 60;
 
 export default async function HomePage() {
   const [areas, hero] = await Promise.all([getAllAreas(), getHomeHero()]);
+  const locale = await getLocale();
 
-  return (
+  return localizePage((
     <>
       {/* ===================== HERO (carrossel editável) ===================== */}
       <HomeHero data={hero} />
@@ -30,7 +32,7 @@ export default async function HomePage() {
       >
         <SectionHeading
           eyebrow="Áreas de atuação"
-          title={`${areas.length} frentes que se conectam`}
+          title={translateContent(locale, "{count} frentes que se conectam", { count: areas.length })}
           subtitle="Cada uma delas com história, parceiros e estratégias próprias, todas alinhadas à agenda ambiental e produtiva de nossa organização"
         />
 
@@ -111,5 +113,5 @@ export default async function HomePage() {
         </div>
       </section>
     </>
-  );
+  ));
 }

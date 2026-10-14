@@ -3,6 +3,7 @@ import "server-only";
 import { getPayload, type Payload } from "payload";
 
 import config from "@/payload.config";
+import { getPreviewPayload } from "@/lib/i18n/preview";
 
 /**
  * Singleton Payload client.
@@ -16,7 +17,7 @@ let cachedPayload: Promise<Payload> | null = null;
 
 export function getPayloadClient(): Promise<Payload> {
   if (!cachedPayload) {
-    cachedPayload = getPayload({ config }).catch((error) => {
+    cachedPayload = getPreviewPayload().then(preview => preview ?? getPayload({ config })).catch((error) => {
       // Reset cache on failure so subsequent attempts retry instead of
       // returning a permanently-rejected promise.
       cachedPayload = null;

@@ -1,4 +1,5 @@
 import "server-only";
+import { getLocale, localizeRecord } from "@/lib/i18n/server";
 
 import { SITE } from "@/lib/site";
 import { withFallback } from "@/lib/cms";
@@ -118,7 +119,7 @@ function toSlide(s: PayloadSlide): HeroSlide {
   };
 }
 
-export async function getHomeHero(): Promise<HomeHeroData> {
+async function getHomeHeroSource(): Promise<HomeHeroData> {
   return withFallback(
     async (payload) => {
       const doc = (await payload.findGlobal({
@@ -140,4 +141,9 @@ export async function getHomeHero(): Promise<HomeHeroData> {
     FALLBACK,
     "getHomeHero",
   );
+}
+
+export async function getHomeHero(...args: Parameters<typeof getHomeHeroSource>): Promise<Awaited<ReturnType<typeof getHomeHeroSource>>> {
+  const [value, locale] = await Promise.all([getHomeHeroSource(...args), getLocale()]);
+  return localizeRecord(value, locale);
 }

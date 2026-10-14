@@ -1,4 +1,5 @@
-import Link from "next/link";
+import { localizePage } from "@/lib/i18n/server";
+import { LocaleLink as Link } from "@/components/locale-provider";
 import { cn } from "@/lib/utils";
 import { ArrowRight, ArrowUpRight } from "lucide-react";
 import type { ReactNode } from "react";
@@ -22,7 +23,7 @@ type Props = {
   className?: string;
 };
 
-export function CTA({ href, children, variant = "primary", external, className }: Props) {
+export async function CTA({ href, children, variant = "primary", external, className }: Props) {
   const cls = cn(
     "inline-flex items-center justify-center gap-2 rounded-full px-6 py-3 text-sm font-semibold transition duration-300",
     styles[variant],
@@ -38,15 +39,15 @@ export function CTA({ href, children, variant = "primary", external, className }
   );
 
   if (external) {
-    return (
+    return localizePage((
       <a className={cls} href={href} target="_blank" rel="noopener noreferrer">
         {content}
       </a>
-    );
+    ));
   }
-  return (
+  return localizePage((
     <Link className={cls} href={href}>
       {content}
     </Link>
-  );
+  ));
 }

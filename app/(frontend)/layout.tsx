@@ -2,6 +2,9 @@ import type { Metadata } from "next";
 import { Sora, Inter } from "next/font/google";
 import Script from "next/script";
 import "./globals.css";
+import { LocaleProvider } from "@/components/locale-provider";
+import { getLocale, localizeMetadata, translateContent } from "@/lib/i18n/server";
+import { LOCALE_INFO } from "@/lib/i18n/routing";
 
 import { Navbar } from "@/components/navbar";
 import { Footer } from "@/components/footer";
@@ -14,12 +17,9 @@ import {
   buildLocalBusinessSchema,
 } from "@/lib/schema";
 
-// Root layout now reads Site Settings from the CMS (brand name, tagline,
-// email). Without a revalidate window every route would inherit whatever
-// was fetched at build time (when Postgres isn't reachable), freezing the
-// navbar/footer/title on the fallback forever — same class of bug we hit
-// with area cover images.
-export const revalidate = 60;
+// Language and published CMS content are request-specific. Never freeze a
+// locale or database-offline build fallback into a shared HTML cache.
+export const dynamic = "force-dynamic";
 
 // Display: Sora (geométrica corporate). Body: Inter (highly readable sans).
 const sora = Sora({
@@ -38,7 +38,7 @@ const inter = Inter({
 
 export async function generateMetadata(): Promise<Metadata> {
   const settings = await getSiteSettings();
-  return {
+  return localizeMetadata({
     metadataBase: new URL(SITE.url),
     title: {
       default: `${settings.name} — ${settings.tagline}`,
@@ -55,7 +55,7 @@ export async function generateMetadata(): Promise<Metadata> {
     },
     robots: { index: true, follow: true, "max-image-preview": "large" },
     alternates: { canonical: SITE.url },
-  };
+  });
 }
 
 // Script inline anti-FOUC: aplica a classe `.dark` antes do React montar,
@@ -72,6 +72,7 @@ export default async function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   const [settings, areas] = await Promise.all([getSiteSettings(), getAllAreas()]);
+  const locale = await getLocale();
   const menuAreas = areas.filter(
     (area) => (area as { showInMenu?: boolean }).showInMenu !== false,
   );
@@ -81,7 +82,7 @@ export default async function RootLayout({
 
   return (
     <html
-      lang="pt-BR"
+      lang={LOCALE_INFO[locale].html}
       className={`${sora.variable} ${inter.variable} h-full antialiased`}
       suppressHydrationWarning
     >
@@ -95,11 +96,12 @@ export default async function RootLayout({
         {bizLd && <JsonLd data={bizLd} />}
       </head>
       <body className="min-h-full flex flex-col">
+        <LocaleProvider locale={locale}>
         <a
           href="#main"
           className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[70] focus:rounded-lg focus:bg-brand-600 focus:px-4 focus:py-2 focus:text-white"
         >
-          Pular para o conteúdo
+          {translateContent(locale, "Pular para o conteúdo")}
         </a>
         <Navbar brandName={settings.name} navItems={settings.navTop} />
         <main id="main" className="flex-1">
@@ -113,6 +115,7 @@ export default async function RootLayout({
           areas={menuAreas}
           social={settings.social}
         />
+        </LocaleProvider>
       </body>
     </html>
   );

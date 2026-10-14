@@ -1,6 +1,7 @@
+import { localizePage, localizeMetadata, getLocale, translateContent } from "@/lib/i18n/server";
 import type { Metadata } from "next";
 import Image from "next/image";
-import Link from "next/link";
+import { LocaleLink as Link } from "@/components/locale-provider";
 import { notFound } from "next/navigation";
 import { ArrowUpRight, ArrowLeft } from "lucide-react";
 
@@ -21,10 +22,7 @@ export const dynamicParams = true;
 // and cover images from the CMS without requiring a redeploy.
 export const revalidate = 60;
 
-export async function generateStaticParams() {
-  const areas = await getAllAreas();
-  return areas.map((a) => ({ slug: a.slug }));
-}
+
 
 export async function generateMetadata({
   params,
@@ -33,9 +31,9 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { slug } = await params;
   const area = await getAreaBySlug(slug);
-  if (!area) return {};
+  if (!area) return localizeMetadata({});
 
-  return {
+  return localizeMetadata({
     title: area.title,
     description: area.short,
     alternates: { canonical: `${SITE.url}/areas/${area.slug}` },
@@ -44,7 +42,7 @@ export async function generateMetadata({
       description: area.short,
       url: `${SITE.url}/areas/${area.slug}`,
     },
-  };
+  });
 }
 
 export default async function AreaPage({
@@ -69,7 +67,7 @@ export default async function AreaPage({
 
   const hasCover = Boolean(area.cover);
 
-  return (
+  return localizePage((
     <>
       <JsonLd data={breadcrumb} />
       {/* HERO da área — com imagem de fundo + máscara quando há capa */}
@@ -253,7 +251,7 @@ export default async function AreaPage({
         <div className="mt-8 flex flex-wrap items-center justify-between gap-4 rounded-2xl bg-brand-700 px-6 py-8 text-white lg:px-10">
           <div>
             <p className="font-display text-lg font-bold">
-              Quer saber mais sobre {area.title.toLowerCase()}?
+              {translateContent(await getLocale(), "Quer saber mais sobre {area}?", { area: area.title })}
             </p>
             <p className="text-sm text-white/80">Conte com o time da WG Bolsoni.</p>
           </div>
@@ -261,5 +259,5 @@ export default async function AreaPage({
         </div>
       </section>
     </>
-  );
+  ));
 }

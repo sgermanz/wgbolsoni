@@ -1,3 +1,4 @@
+import { localizePage } from "@/lib/i18n/server";
 import Image from "next/image";
 
 import { toEmbedUrl } from "@/lib/embed";
@@ -18,7 +19,7 @@ type ImageBlockFields = {
   size?: "thumbnail" | "card" | "cover";
 };
 
-export function ImageBlockRenderer({ block }: { block: ImageBlockFields }) {
+export async function ImageBlockRenderer({ block }: { block: ImageBlockFields }) {
   if (!isMedia(block.image) || !block.image.url) return null;
   const sizes =
     block.size === "thumbnail"
@@ -26,7 +27,7 @@ export function ImageBlockRenderer({ block }: { block: ImageBlockFields }) {
       : block.size === "cover"
         ? "100vw"
         : "(min-width: 768px) 768px, 100vw";
-  return (
+  return localizePage((
     <figure className="my-8">
       <Image
         src={block.image.url}
@@ -42,7 +43,7 @@ export function ImageBlockRenderer({ block }: { block: ImageBlockFields }) {
         </figcaption>
       )}
     </figure>
-  );
+  ));
 }
 
 type VideoBlockFields = {
@@ -52,11 +53,11 @@ type VideoBlockFields = {
   caption?: string;
 };
 
-export function VideoBlockRenderer({ block }: { block: VideoBlockFields }) {
+export async function VideoBlockRenderer({ block }: { block: VideoBlockFields }) {
   if (block.source === "url" && block.url) {
     const embed = toEmbedUrl(block.url);
     if (!embed) return null;
-    return (
+    return localizePage((
       <figure className="my-8">
         <div className="aspect-video overflow-hidden rounded-2xl bg-black">
           <iframe
@@ -73,10 +74,10 @@ export function VideoBlockRenderer({ block }: { block: VideoBlockFields }) {
           </figcaption>
         )}
       </figure>
-    );
+    ));
   }
   if (block.source === "upload" && isMedia(block.file) && block.file.url) {
-    return (
+    return localizePage((
       <figure className="my-8">
         <video
           src={block.file.url}
@@ -89,7 +90,7 @@ export function VideoBlockRenderer({ block }: { block: VideoBlockFields }) {
           </figcaption>
         )}
       </figure>
-    );
+    ));
   }
   return null;
 }
@@ -99,7 +100,7 @@ type GalleryBlockFields = {
   columns?: "2" | "3" | "4";
 };
 
-export function GalleryBlockRenderer({ block }: { block: GalleryBlockFields }) {
+export async function GalleryBlockRenderer({ block }: { block: GalleryBlockFields }) {
   if (!block.images?.length) return null;
   const cols =
     block.columns === "2"
@@ -107,7 +108,7 @@ export function GalleryBlockRenderer({ block }: { block: GalleryBlockFields }) {
       : block.columns === "4"
         ? "sm:grid-cols-2 lg:grid-cols-4"
         : "sm:grid-cols-2 lg:grid-cols-3";
-  return (
+  return localizePage((
     <div className={`my-8 grid grid-cols-1 gap-3 ${cols}`}>
       {block.images.map((item, i) => {
         if (!isMedia(item.image) || !item.image.url) return null;
@@ -130,5 +131,5 @@ export function GalleryBlockRenderer({ block }: { block: GalleryBlockFields }) {
         );
       })}
     </div>
-  );
+  ));
 }

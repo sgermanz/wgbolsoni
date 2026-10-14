@@ -1,4 +1,8 @@
 "use client";
+import { Localized } from "@/components/localized";
+import { useLocale } from "@/components/locale-provider";
+import { LOCALE_INFO } from "@/lib/i18n/routing";
+
 
 import { Play, Pause, Square, Volume2 } from "lucide-react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
@@ -20,7 +24,9 @@ type Props = {
  * unsupported. Respects prefers-reduced-motion: the playback itself still
  * works (audio isn't motion), only animated transitions are toned down.
  */
-export function TTSButton({ audioUrl, text, className = "" }: Props) {
+export function TTSButton({ audioUrl: recordedAudioUrl, text, className = "" }: Props) {
+  const locale = useLocale();
+  const audioUrl = locale === "pt" ? recordedAudioUrl : undefined;
   const [supported, setSupported] = useState(true);
   const [state, setState] = useState<"idle" | "playing" | "paused">("idle");
   const [rate, setRate] = useState(1);
@@ -44,11 +50,11 @@ export function TTSButton({ audioUrl, text, className = "" }: Props) {
       return null;
     const voices = window.speechSynthesis.getVoices();
     return (
-      voices.find((v) => v.lang?.toLowerCase().startsWith("pt-br")) ??
-      voices.find((v) => v.lang?.toLowerCase().startsWith("pt")) ??
+      voices.find((v) => v.lang?.toLowerCase() === LOCALE_INFO[locale].intl.toLowerCase()) ??
+      voices.find((v) => v.lang?.toLowerCase().startsWith(locale)) ??
       null
     );
-  }, [state]); // re-evaluate after voiceschanged fires (rough heuristic)
+  }, [state, locale]);
 
   // Cleanup on unmount.
   useEffect(() => {
@@ -96,7 +102,7 @@ export function TTSButton({ audioUrl, text, className = "" }: Props) {
     if (!text || typeof window === "undefined") return;
     window.speechSynthesis.cancel();
     const utter = new SpeechSynthesisUtterance(text);
-    utter.lang = ptVoice?.lang ?? "pt-BR";
+    utter.lang = ptVoice?.lang ?? LOCALE_INFO[locale].intl;
     if (ptVoice) utter.voice = ptVoice;
     utter.rate = rate;
     utter.onend = () => setState("idle");
@@ -104,7 +110,7 @@ export function TTSButton({ audioUrl, text, className = "" }: Props) {
     utterRef.current = utter;
     window.speechSynthesis.speak(utter);
     setState("playing");
-  }, [audioUrl, text, rate, state, ptVoice]);
+  }, [audioUrl, text, rate, state, ptVoice, locale]);
 
   const pause = useCallback(() => {
     if (audioRef.current) {
@@ -117,7 +123,7 @@ export function TTSButton({ audioUrl, text, className = "" }: Props) {
 
   if (!supported) return null;
 
-  return (
+  return <Localized>{(
     <div
       className={`inline-flex items-center gap-2 rounded-full border border-[var(--border)] bg-[var(--surface-2)] px-2 py-1.5 ${className}`}
     >
@@ -170,5 +176,5 @@ export function TTSButton({ audioUrl, text, className = "" }: Props) {
         <option value={1.5}>1.5×</option>
       </select>
     </div>
-  );
+  )}</Localized>;
 }

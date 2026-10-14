@@ -1,4 +1,5 @@
 import "server-only";
+import { getLocale, localizeRecord } from "@/lib/i18n/server";
 
 import { withFallback } from "@/lib/cms";
 
@@ -50,7 +51,7 @@ const toBook = (doc: PayloadBookDoc): BookRecord => {
   };
 };
 
-export async function listBooks(): Promise<BookRecord[]> {
+async function listBooksSource(): Promise<BookRecord[]> {
   return withFallback(
     async (payload) => {
       const result = await payload.find({
@@ -64,4 +65,9 @@ export async function listBooks(): Promise<BookRecord[]> {
     [],
     "listBooks",
   );
+}
+
+export async function listBooks(...args: Parameters<typeof listBooksSource>): Promise<Awaited<ReturnType<typeof listBooksSource>>> {
+  const [value, locale] = await Promise.all([listBooksSource(...args), getLocale()]);
+  return value.map(book => localizeRecord(book, locale, true));
 }

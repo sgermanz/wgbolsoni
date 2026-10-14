@@ -1,16 +1,17 @@
+import { localizePage, localizeMetadata } from "@/lib/i18n/server";
 import type { Metadata } from "next";
 import { Reveal } from "@/components/reveal";
 import { SectionHeading } from "@/components/section-heading";
 import { ContactForm } from "@/components/contact-form";
 
-export const metadata: Metadata = {
+const baseMetadata: Metadata = {
   title: "Contato",
   description:
     "Fale com a WGBolsoni sobre proteína, florestamentos, biomassa, CPR Verde e demais frentes de atuação.",
 };
 
-export default function ContatoPage() {
-  return (
+export default async function ContatoPage() {
+  return localizePage((
     <>
       <section className="relative isolate overflow-hidden border-b border-[var(--border)]">
         <div
@@ -47,5 +48,7 @@ export default function ContatoPage() {
           </Reveal>
       </section>
     </>
-  );
+  ));
 }
+
+export async function generateMetadata(): Promise<Metadata> { return localizeMetadata(baseMetadata); }

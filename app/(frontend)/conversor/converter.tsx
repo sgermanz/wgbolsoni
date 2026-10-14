@@ -3,6 +3,9 @@
 import { useMemo, useState } from "react";
 import { ArrowLeftRight } from "lucide-react";
 import { Reveal } from "@/components/reveal";
+import { Localized } from "@/components/localized";
+import { useLocale, useTranslate } from "@/components/locale-provider";
+import { LOCALE_INFO } from "@/lib/i18n/routing";
 
 /*
  * Conversor multi-categoria. Cada categoria tem uma unidade-base e cada unidade
@@ -72,6 +75,8 @@ const CATEGORIES: Record<string, { name: string; baseLabel: string; units: Unit[
 type CatKey = keyof typeof CATEGORIES;
 
 export function Converter() {
+  const locale = useLocale();
+  const t = useTranslate();
   const [cat, setCat] = useState<CatKey>("area");
   const [from, setFrom] = useState<string>("ha");
   const [to, setTo] = useState<string>("alqueire-paulista");
@@ -87,11 +92,11 @@ export function Converter() {
     if (!u1 || !u2) return "";
     const out = (v * u1.factor) / u2.factor;
     // Formatação pt-BR com até 6 casas decimais.
-    return out.toLocaleString("pt-BR", {
+    return out.toLocaleString(LOCALE_INFO[locale].intl, {
       maximumFractionDigits: 6,
       minimumFractionDigits: 0,
     });
-  }, [value, from, to, units]);
+  }, [value, from, to, units, locale]);
 
   const swap = () => {
     setFrom(to);
@@ -106,7 +111,7 @@ export function Converter() {
     setValue("1");
   };
 
-  return (
+  return <Localized>{(
     <Reveal>
       <div className="rounded-2xl border border-[var(--border)] bg-[var(--surface-2)] p-5 lg:p-7">
         {/* Categorias */}
@@ -181,11 +186,9 @@ export function Converter() {
         </div>
 
         <p className="mt-5 text-xs text-[var(--content-soft)]">
-          Base de cálculo: {CATEGORIES[cat].baseLabel}. Conversões usam fatores
-          padrão; para uso financeiro/contratual, verifique a unidade
-          aplicável.
+          {t("Base de cálculo: {unit}. Conversões usam fatores padrão; para uso financeiro/contratual, verifique a unidade aplicável.", { unit: t(CATEGORIES[cat].baseLabel) })}
         </p>
       </div>
     </Reveal>
-  );
+  )}</Localized>;
 }

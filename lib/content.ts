@@ -1,4 +1,5 @@
 import "server-only";
+import { getLocale, localizeRecord } from "@/lib/i18n/server";
 
 import { cache } from "react";
 import type { SerializedEditorState } from "@payloadcms/richtext-lexical/lexical";
@@ -127,7 +128,7 @@ const fromPayloadArea = (a: PayloadArea): AreaRecord => {
 
 /* ----------------------------- Public API --------------------------------- */
 
-export async function getAllAreas(): Promise<AreaRecord[]> {
+async function getAllAreasSource(): Promise<AreaRecord[]> {
   return withFallback(
     async (payload) => {
       const result = await payload.find({
@@ -144,7 +145,10 @@ export async function getAllAreas(): Promise<AreaRecord[]> {
   );
 }
 
-export async function getAreaBySlug(
+export const getAllAreasForSitemap = getAllAreasSource;
+const getAllAreasCached = cache(getAllAreasSource);
+
+async function getAreaBySlugSource(
   slug: string,
 ): Promise<AreaRecord | undefined> {
   return withFallback(
@@ -164,7 +168,7 @@ export async function getAreaBySlug(
   );
 }
 
-export async function getPageBySlug(
+async function getPageBySlugSource(
   slug: string,
 ): Promise<PageRecord | undefined> {
   return withFallback(
@@ -230,7 +234,7 @@ export async function getPageBySlug(
 
 // Memoized per-request: layout.tsx (metadata + JSON-LD) and Navbar/Footer
 // each need this, and without cache() we'd hit Payload twice per request.
-export const getSiteSettings = cache(async (): Promise<SiteSettingsRecord> => {
+const getSiteSettingsSource = cache(async (): Promise<SiteSettingsRecord> => {
   const legacy: SiteSettingsRecord = {
     name: SITE.name,
     legalName: SITE.legalName,
@@ -266,3 +270,23 @@ export const getSiteSettings = cache(async (): Promise<SiteSettingsRecord> => {
     "getSiteSettings",
   );
 });
+
+export async function getAllAreas(...args: Parameters<typeof getAllAreasSource>): Promise<Awaited<ReturnType<typeof getAllAreasSource>>> {
+  const [value, locale] = await Promise.all([getAllAreasCached(...args), getLocale()]);
+  return localizeRecord(value, locale);
+}
+
+export async function getAreaBySlug(...args: Parameters<typeof getAreaBySlugSource>): Promise<Awaited<ReturnType<typeof getAreaBySlugSource>>> {
+  const [value, locale] = await Promise.all([getAreaBySlugSource(...args), getLocale()]);
+  return localizeRecord(value, locale);
+}
+
+export async function getPageBySlug(...args: Parameters<typeof getPageBySlugSource>): Promise<Awaited<ReturnType<typeof getPageBySlugSource>>> {
+  const [value, locale] = await Promise.all([getPageBySlugSource(...args), getLocale()]);
+  return localizeRecord(value, locale);
+}
+
+export async function getSiteSettings(...args: Parameters<typeof getSiteSettingsSource>): Promise<Awaited<ReturnType<typeof getSiteSettingsSource>>> {
+  const [value, locale] = await Promise.all([getSiteSettingsSource(...args), getLocale()]);
+  return localizeRecord(value, locale);
+}

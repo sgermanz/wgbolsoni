@@ -1,3 +1,4 @@
+import { localizePage, localizeMetadata } from "@/lib/i18n/server";
 import type { Metadata } from "next";
 import Image from "next/image";
 import { Reveal } from "@/components/reveal";
@@ -6,7 +7,7 @@ import { BooksSection } from "@/components/books-section";
 import { getPageBySlug } from "@/lib/content";
 import { listBooks } from "@/lib/books";
 
-export const metadata: Metadata = {
+const baseMetadata: Metadata = {
   title: "Conceito",
   description:
     "O conceito da WG Bolsoni: holding de participações que combina visão setorial, governança e capacidade de execução.",
@@ -24,7 +25,7 @@ export default async function ConceitoPage() {
   const cover = page?.cover;
   const booksSection = page?.booksSection;
 
-  return (
+  return localizePage((
     <>
       <section className="relative isolate overflow-hidden border-b border-[var(--border)]">
         <div
@@ -136,5 +137,7 @@ export default async function ConceitoPage() {
         }
       />
     </>
-  );
+  ));
 }
+
+export async function generateMetadata(): Promise<Metadata> { return localizeMetadata(baseMetadata); }

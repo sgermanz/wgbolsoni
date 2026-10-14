@@ -1,3 +1,4 @@
+import { localizePage } from "@/lib/i18n/server";
 import { Reveal } from "./reveal";
 
 type Props = {
@@ -7,10 +8,10 @@ type Props = {
   align?: "left" | "center";
 };
 
-export function SectionHeading({ eyebrow, title, subtitle, align = "left" }: Props) {
+export async function SectionHeading({ eyebrow, title, subtitle, align = "left" }: Props) {
   const alignCls =
     align === "center" ? "mx-auto max-w-3xl text-center" : "max-w-2xl";
-  return (
+  return localizePage((
     <div className={alignCls}>
       {eyebrow && (
         <Reveal>
@@ -35,5 +36,5 @@ export function SectionHeading({ eyebrow, title, subtitle, align = "left" }: Pro
         </Reveal>
       )}
     </div>
-  );
+  ));
 }

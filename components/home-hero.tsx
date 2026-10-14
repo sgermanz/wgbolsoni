@@ -1,7 +1,10 @@
 "use client";
+import { Localized } from "@/components/localized";
+import { useTranslate } from "@/components/locale-provider";
+
 
 import Image from "next/image";
-import Link from "next/link";
+import { LocaleLink as Link } from "@/components/locale-provider";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { ArrowRight, ArrowUpRight, ChevronLeft, ChevronRight } from "lucide-react";
@@ -58,7 +61,7 @@ function SlideBackground({ slide }: { slide: HeroSlide }) {
   const bg = slide.background;
 
   if (bg.type === "image") {
-    return (
+    return <Localized>{(
       <>
         <Image
           src={bg.url}
@@ -77,11 +80,11 @@ function SlideBackground({ slide }: { slide: HeroSlide }) {
           className="absolute inset-0 -z-10 bg-gradient-to-t from-black/85 via-black/55 to-black/35"
         />
       </>
-    );
+    )}</Localized>;
   }
 
   if (bg.type === "video") {
-    return (
+    return <Localized>{(
       <>
         <video
           className={cn(
@@ -102,12 +105,12 @@ function SlideBackground({ slide }: { slide: HeroSlide }) {
           className="absolute inset-0 -z-10 bg-gradient-to-t from-black/85 via-black/55 to-black/35"
         />
       </>
-    );
+    )}</Localized>;
   }
 
   if (bg.type === "youtube") {
     const embed = toBackgroundEmbedUrl(bg.url);
-    return (
+    return <Localized>{(
       <>
         {bg.poster && (
           <Image
@@ -145,11 +148,11 @@ function SlideBackground({ slide }: { slide: HeroSlide }) {
           className="absolute inset-0 -z-10 bg-gradient-to-t from-black/85 via-black/55 to-black/35"
         />
       </>
-    );
+    )}</Localized>;
   }
 
   // none → keep the original light gradient-mesh look
-  return (
+  return <Localized>{(
     <>
       <div
         aria-hidden
@@ -160,11 +163,11 @@ function SlideBackground({ slide }: { slide: HeroSlide }) {
         className="absolute inset-0 -z-10 bg-[radial-gradient(120%_120%_at_50%_-20%,transparent_40%,var(--surface)_100%)]"
       />
     </>
-  );
+  )}</Localized>;
 }
 
 function SlideContent({ slide, onDark }: { slide: HeroSlide; onDark: boolean }) {
-  return (
+  return <Localized>{(
     <div className="mx-auto w-full max-w-7xl px-5 pb-24 pt-36 lg:px-8 lg:pb-32 lg:pt-48">
       {slide.eyebrow && (
         <motion.p
@@ -225,10 +228,11 @@ function SlideContent({ slide, onDark }: { slide: HeroSlide; onDark: boolean }) 
         </motion.div>
       )}
     </div>
-  );
+  )}</Localized>;
 }
 
 export function HomeHero({ data }: { data: HomeHeroData }) {
+  const t = useTranslate();
   const { slides, autoplaySeconds } = data;
   const [index, setIndex] = useState(0);
   const [paused, setPaused] = useState(false);
@@ -256,7 +260,7 @@ export function HomeHero({ data }: { data: HomeHeroData }) {
   const slide = slides[index];
   const onDark = slide.background.type !== "none";
 
-  return (
+  return <Localized>{(
     <section
       className="relative isolate flex min-h-[88vh] flex-col justify-center overflow-hidden"
       onMouseEnter={() => setPaused(true)}
@@ -319,7 +323,7 @@ export function HomeHero({ data }: { data: HomeHeroData }) {
                 key={i}
                 type="button"
                 onClick={() => go(i)}
-                aria-label={`Ir para o slide ${i + 1}`}
+                aria-label={t("Ir para o slide {number}", { number: i + 1 })}
                 aria-current={i === index}
                 className={cn(
                   "h-2 rounded-full transition-all",
@@ -335,5 +339,5 @@ export function HomeHero({ data }: { data: HomeHeroData }) {
         </>
       )}
     </section>
-  );
+  )}</Localized>;
 }

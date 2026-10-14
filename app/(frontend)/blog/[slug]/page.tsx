@@ -1,6 +1,8 @@
+import { localizePage, localizeMetadata, getLocale } from "@/lib/i18n/server";
 import type { Metadata } from "next";
+import { LOCALE_INFO, type Locale } from "@/lib/i18n/routing";
 import Image from "next/image";
-import Link from "next/link";
+import { LocaleLink as Link } from "@/components/locale-provider";
 import { notFound } from "next/navigation";
 import { ArrowLeft, Calendar, Clock, User } from "lucide-react";
 
@@ -27,8 +29,8 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { slug } = await params;
   const post = await getPostBySlug(slug);
-  if (!post) return {};
-  return {
+  if (!post) return localizeMetadata({});
+  return localizeMetadata({
     title: post.seo?.metaTitle || post.title,
     description: post.seo?.metaDescription || post.excerpt,
     alternates: { canonical: `${SITE.url}/blog/${post.slug}` },
@@ -50,12 +52,12 @@ export async function generateMetadata({
       title: post.title,
       description: post.excerpt,
     },
-  };
+  });
 }
 
-const formatDate = (iso?: string) =>
+const formatDate = (iso: string | undefined, locale: Locale) =>
   iso
-    ? new Date(iso).toLocaleDateString("pt-BR", {
+    ? new Date(iso).toLocaleDateString(LOCALE_INFO[locale].intl, {
         day: "2-digit",
         month: "long",
         year: "numeric",
@@ -85,7 +87,7 @@ export default async function PostPage({
   ]);
   const faqLd = post.geo?.faq ? buildFaqSchema(post.geo.faq) : null;
 
-  return (
+  return localizePage((
     <article>
       <JsonLd data={articleLd} />
       <JsonLd data={breadcrumbLd} />
@@ -141,7 +143,7 @@ export default async function PostPage({
               {post.publishedAt && (
                 <span className="inline-flex items-center gap-2">
                   <Calendar className="h-4 w-4" />
-                  {formatDate(post.publishedAt)}
+                  {formatDate(post.publishedAt, await getLocale())}
                 </span>
               )}
               {post.readingTime && (
@@ -258,5 +260,5 @@ export default async function PostPage({
         </section>
       )}
     </article>
-  );
+  ));
 }

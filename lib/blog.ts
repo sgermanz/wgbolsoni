@@ -1,4 +1,5 @@
 import "server-only";
+import { getLocale, localizeRecord } from "@/lib/i18n/server";
 
 import type { Where } from "payload";
 import type { SerializedEditorState } from "@payloadcms/richtext-lexical/lexical";
@@ -148,7 +149,7 @@ export type PostListResult = {
   page: number;
 };
 
-export async function listPosts({
+async function listPostsSource({
   page = 1,
   category,
   tag,
@@ -182,7 +183,7 @@ export async function listPosts({
   );
 }
 
-export async function getPostBySlug(
+async function getPostBySlugSource(
   slug: string,
 ): Promise<PostRecord | undefined> {
   return withFallback(
@@ -205,7 +206,7 @@ export async function getPostBySlug(
   );
 }
 
-export async function getRelated(
+async function getRelatedSource(
   postId: string | number,
   category?: PostCategory,
   limit = 3,
@@ -228,4 +229,19 @@ export async function getRelated(
     [],
     "getRelated",
   );
+}
+
+export async function listPosts(...args: Parameters<typeof listPostsSource>): Promise<Awaited<ReturnType<typeof listPostsSource>>> {
+  const [value, locale] = await Promise.all([listPostsSource(...args), getLocale()]);
+  return localizeRecord(value, locale);
+}
+
+export async function getPostBySlug(...args: Parameters<typeof getPostBySlugSource>): Promise<Awaited<ReturnType<typeof getPostBySlugSource>>> {
+  const [value, locale] = await Promise.all([getPostBySlugSource(...args), getLocale()]);
+  return localizeRecord(value, locale);
+}
+
+export async function getRelated(...args: Parameters<typeof getRelatedSource>): Promise<Awaited<ReturnType<typeof getRelatedSource>>> {
+  const [value, locale] = await Promise.all([getRelatedSource(...args), getLocale()]);
+  return localizeRecord(value, locale);
 }

@@ -1,4 +1,5 @@
-import Link from "next/link";
+import { localizePage } from "@/lib/i18n/server";
+import { LocaleLink as Link } from "@/components/locale-provider";
 import { SITE } from "@/lib/site";
 import { Brand } from "@/components/brand";
 
@@ -15,7 +16,7 @@ type Props = {
   social?: SocialLink[];
 };
 
-export function Footer({
+export async function Footer({
   brandName,
   tagline,
   copyrightStart,
@@ -23,7 +24,7 @@ export function Footer({
   areas,
   social = [],
 }: Props) {
-  return (
+  return localizePage((
     <footer className="border-t border-[var(--border)] bg-[var(--surface-2)]">
       <div className="mx-auto max-w-7xl px-5 py-16 lg:px-8">
         <div className="grid gap-12 md:grid-cols-2 lg:grid-cols-4">
@@ -105,7 +106,7 @@ export function Footer({
         </div>
       </div>
     </footer>
-  );
+  ));
 }
 
 function socialLabel(platform: string) {

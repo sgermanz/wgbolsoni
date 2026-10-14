@@ -1,4 +1,6 @@
 "use client";
+import { Localized } from "@/components/localized";
+
 
 import Script from "next/script";
 import { useState } from "react";
@@ -59,7 +61,7 @@ export function ContactForm({ turnstileSiteKey }: Props) {
     }
   }
 
-  return (
+  return <Localized>{(
     <form onSubmit={onSubmit} className="space-y-5" noValidate>
       {turnstileSiteKey && (
         <Script
@@ -144,7 +146,7 @@ export function ContactForm({ turnstileSiteKey }: Props) {
         </p>
       )}
     </form>
-  );
+  )}</Localized>;
 }
 
 type FieldProps = {
@@ -168,7 +170,7 @@ function Field({
 }: FieldProps) {
   const cls =
     "w-full rounded-xl border border-[var(--border)] bg-[var(--surface)] px-4 py-3 text-sm text-[var(--content)] outline-none transition placeholder:text-[var(--content-soft)]/50 focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20";
-  return (
+  return <Localized>{(
     <label className="block">
       <span className="mb-1.5 block text-sm font-medium text-[var(--content-soft)]">
         {label}
@@ -191,5 +193,5 @@ function Field({
         />
       )}
     </label>
-  );
+  )}</Localized>;
 }

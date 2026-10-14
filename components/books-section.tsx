@@ -1,3 +1,4 @@
+import { localizePage } from "@/lib/i18n/server";
 import Image from "next/image";
 
 import type { BookRecord } from "@/lib/books";
@@ -15,7 +16,7 @@ type Props = {
  * portrait (standard book proportion). Purchase link, when present, sits at
  * the bottom of each card as a soft CTA.
  */
-export function BooksSection({
+export async function BooksSection({
   books,
   eyebrow,
   title,
@@ -26,7 +27,7 @@ export function BooksSection({
   const resolvedEyebrow = eyebrow === undefined ? "Bibliografia" : eyebrow;
   const resolvedTitle = title || "Livros do autor";
 
-  return (
+  return localizePage((
     <section className="border-t border-[var(--border)] bg-[var(--surface-2)]">
       <div className="mx-auto max-w-6xl px-5 py-16 lg:px-8 lg:py-24">
         {resolvedEyebrow && (
@@ -95,5 +96,5 @@ export function BooksSection({
         </div>
       </div>
     </section>
-  );
+  ));
 }

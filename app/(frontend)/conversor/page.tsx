@@ -1,15 +1,16 @@
+import { localizePage, localizeMetadata } from "@/lib/i18n/server";
 import type { Metadata } from "next";
 import { Reveal } from "@/components/reveal";
 import { Converter } from "./converter";
 
-export const metadata: Metadata = {
+const baseMetadata: Metadata = {
   title: "Conversor de Medidas",
   description:
     "Ferramenta interativa de conversão de unidades para agronegócio, floresta e energia: hectares, alqueires, m³, toneladas, MWh, GJ, sacas.",
 };
 
-export default function ConversorPage() {
-  return (
+export default async function ConversorPage() {
+  return localizePage((
     <>
       <section className="relative isolate overflow-hidden border-b border-[var(--border)]">
         <div
@@ -41,5 +42,7 @@ export default function ConversorPage() {
         <Converter />
       </section>
     </>
-  );
+  ));
 }
+
+export async function generateMetadata(): Promise<Metadata> { return localizeMetadata(baseMetadata); }

@@ -1,6 +1,9 @@
 "use client";
+import { Localized } from "@/components/localized";
+import { LanguageSelector } from "@/components/language-selector";
 
-import Link from "next/link";
+
+import { LocaleLink as Link } from "@/components/locale-provider";
 import { useEffect, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { ChevronDown, Menu, X, Sun, Moon } from "lucide-react";
@@ -48,9 +51,10 @@ export function Navbar({
   const iconBtn =
     "grid h-10 w-10 place-items-center rounded-lg text-ink-500 transition hover:bg-white hover:text-ink-800";
 
-  return (
+  return <Localized>{(
     <header className="fixed inset-x-0 top-0 z-50 border-b border-ink-200 bg-ink-50">
-      <nav className="relative mx-auto flex h-16 max-w-7xl items-center gap-6 px-5 lg:h-20 lg:px-8" aria-label="Principal">
+      <nav className="relative mx-auto flex h-16 max-w-7xl items-center gap-6 px-5 lg:h-20 lg:px-8" aria-label="Navegação principal">
+        <div className="lg:hidden"><LanguageSelector /></div>
         {/* No mobile o logo fica centralizado (posição absoluta, ignora o
             espaço assimétrico dos ícones à direita); no desktop volta ao
             fluxo normal, primeiro item à esquerda. */}
@@ -123,6 +127,7 @@ export function Navbar({
         </div>
 
         <div className="ml-auto flex items-center gap-2">
+          <div className="hidden lg:block"><LanguageSelector /></div>
           <button
             type="button"
             onClick={toggleTheme}
@@ -188,5 +193,5 @@ export function Navbar({
         )}
       </AnimatePresence>
     </header>
-  );
+  )}</Localized>;
 }

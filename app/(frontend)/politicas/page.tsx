@@ -1,3 +1,4 @@
+import { localizePage, localizeMetadata, getLocale, localizeRecord } from "@/lib/i18n/server";
 import type { Metadata } from "next";
 import { Reveal } from "@/components/reveal";
 import { RichBody } from "@/components/rich-body";
@@ -7,14 +8,14 @@ import { withFallback } from "@/lib/cms";
 // Read the published document on every request, never an autosaved draft.
 export const dynamic = "force-dynamic";
 
-export const metadata: Metadata = {
+const baseMetadata: Metadata = {
   title: "Políticas",
   description:
     "Princípios de conduta, governança, sustentabilidade e privacidade da WG Bolsoni.",
 };
 
 export default async function PoliticasPage() {
-  const page = await withFallback(
+  const sourcePage = await withFallback(
     async (payload) => {
       const result = await payload.find({
         collection: "pages",
@@ -36,7 +37,8 @@ export default async function PoliticasPage() {
     "PoliticasPage",
   );
 
-  return (
+  const page = localizeRecord(sourcePage, await getLocale());
+  return localizePage((
     <>
       <section className="relative isolate overflow-hidden border-b border-[var(--border)]">
         <div
@@ -113,5 +115,7 @@ export default async function PoliticasPage() {
         </Reveal>
       </section>
     </>
-  );
+  ));
 }
+
+export async function generateMetadata(): Promise<Metadata> { return localizeMetadata(baseMetadata); }
