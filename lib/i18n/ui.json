@@ -1,4 +1,7 @@
 [
+  {"pt":"Nova frente","en":"New sector","es":"Nueva área","fr":"Nouveau secteur","zh":"新业务领域"},
+  {"pt":"Inclui Biomassa","en":"Includes biomass","es":"Incluye biomasa","fr":"Inclut la biomasse","zh":"包括生物质"},
+  {"pt":"Biomassa (subproduto)","en":"Biomass (by-product)","es":"Biomasa (subproducto)","fr":"Biomasse (sous-produit)","zh":"生物质（副产品）"},
   {
     "pt": "mídias sociais",
     "en": "social media",
