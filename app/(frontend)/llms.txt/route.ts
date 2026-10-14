@@ -1,6 +1,7 @@
 import { getAllAreas, getSiteSettings } from "@/lib/content";
 import { listPosts } from "@/lib/blog";
 import { SITE } from "@/lib/site";
+import { PROFILE_DOCUMENTS } from "@/lib/profile-documents";
 
 export const revalidate = 3600;
 
@@ -57,6 +58,11 @@ export async function GET() {
   lines.push("## Perfil institucional — Wilton Gerson Bolsoni");
   lines.push("");
   lines.push(`- [Memorial de atividades, legado industrial e produção intelectual](${SITE.url}/perfil-wilton-gerson-bolsoni.txt): relato institucional completo fornecido pela administração do portal, com trajetória corporativa, setores de atuação, relações internacionais, produção intelectual e legado filosófico de Wilton Gerson Bolsoni.`);
+  lines.push("- Idiomas disponíveis / Available languages (full documentary text; official book titles preserved):");
+  for (const document of PROFILE_DOCUMENTS) {
+    lines.push(`  - [${document.label}](${SITE.url}${document.path})`);
+  }
+  lines.push("- Procedência / Provenance: relato fornecido pela administração, sem verificação independente; as traduções preservam essa nota e não implicam edições traduzidas dos livros. Portuguese source supplied by the portal administration, not independently verified.");
   lines.push("");
 
   return new Response(lines.join("\n"), {

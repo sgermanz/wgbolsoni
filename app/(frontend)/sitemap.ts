@@ -4,6 +4,7 @@ import { SITE } from "@/lib/site";
 import { getAllAreasForSitemap } from "@/lib/content";
 import { withFallback } from "@/lib/cms";
 import { LOCALES, LOCALE_INFO, localeHref } from "@/lib/i18n/routing";
+import { PROFILE_DOCUMENTS } from "@/lib/profile-documents";
 
 // Read the live catalog at runtime, not the database-offline build fallback.
 export const dynamic = "force-dynamic";
@@ -23,6 +24,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       changeFrequency: "monthly" as const, priority,
       alternates: { languages: Object.fromEntries(LOCALES.map(code => [LOCALE_INFO[code].html, `${base}${localeHref(code, path)}`])) },
     }))),
-    { url: `${base}/perfil-wilton-gerson-bolsoni.txt`, changeFrequency: "monthly" as const, priority: 0.7 },
+    ...PROFILE_DOCUMENTS.map(document => ({
+      url: `${base}${document.path}`, changeFrequency: "monthly" as const, priority: 0.7,
+      alternates: { languages: {
+        ...Object.fromEntries(PROFILE_DOCUMENTS.map(alternative => [LOCALE_INFO[alternative.locale].html, `${base}${alternative.path}`])),
+        "x-default": `${base}/perfil-wilton-gerson-bolsoni.txt`,
+      } },
+    })),
   ];
 }
